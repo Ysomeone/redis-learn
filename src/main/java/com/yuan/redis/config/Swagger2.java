@@ -1,6 +1,7 @@
 package com.yuan.redis.config;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -14,8 +15,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author yuan
+ */
 @Configuration
 @EnableSwagger2
+@ConditionalOnProperty(prefix = "swagger",value = {"enable"},havingValue = "true")
 public class Swagger2 {
     @Bean
     public Docket createRestApi() {
@@ -35,7 +40,11 @@ public class Swagger2 {
                 .build();
     }
 
-    //权限控制，在请求参数加上sessionId
+    /**
+     * 权限控制，在请求参数加上sessionId
+     *
+     * @return
+     */
     private List<ApiKey> security() {
         List<ApiKey> apiKeyList = new ArrayList();
         ApiKey apiKey = new ApiKey("sessionId", "sessionId", "query");

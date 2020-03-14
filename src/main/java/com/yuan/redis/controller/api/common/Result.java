@@ -1,4 +1,4 @@
-package com.yuan.redis.controller.common;
+package com.yuan.redis.controller.api.common;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * 返回报文格式
+ *
+ * @author yuan
  */
 @Data
 @AllArgsConstructor
