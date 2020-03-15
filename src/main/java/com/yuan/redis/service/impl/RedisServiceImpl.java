@@ -58,6 +58,9 @@ public class RedisServiceImpl implements RedisService {
         redisTemplate.opsForList().set("yuan1",1L,"2");
         redisTemplate.opsForList().range("yuan",1,3);
 
+
+
+
     }
 
     public static void main(String[] args) {
