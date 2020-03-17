@@ -7,12 +7,6 @@ package com.yuan.redis.service;
  */
 public interface RedisService {
 
-    String getSet(String key, String value);
 
-    void set(String key, String value, Long time);
-
-    Boolean setnx(String key, String value);
-
-     void test();
 
 }

@@ -39,8 +39,6 @@ public class UserController {
             @ApiImplicitParam(paramType = "query", name = "password", value = "密码", required = true, dataType = "string"),
     })
     public Result<String> setValue(String username, String password) {
-        redisService.test();
-        redisService.getSet("username",password);
         return Result.jsonStringOk();
     }
 

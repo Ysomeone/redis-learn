@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuan.redis.dao.UserLikeDao">
+
+    <resultMap id="UserLikeResultMap" type="com.yuan.redis.entity.UserLike">
+        <id property="id" column="id"/>
+        <result property="likedUserId" column="liked_user_id"/>
+        <result property="likedPostId" column="liked_post_id"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+    <sql id="base_column">
+		 id ,liked_user_id ,liked_post_id ,status ,create_time ,update_time 
+	</sql>
+
+    <sql id="base_value_column">
+		 #{id},#{likedUserId},#{likedPostId},#{status},#{createTime},#{updateTime}
+	</sql>
+
+    <!-- 定义可重用的WHERE SQL公共代码段，可以包含在其他语句中 -->
+    <sql id="where_column">
+        <if test="ids != null  and ids.size > 0  ">
+            AND ID IN
+            <foreach item="id" index="index" collection="ids" open="("
+                     separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="id != null ">
+            AND id = #{id,jdbcType=INTEGER}
+        </if>
+
+        <!-- 大于等于id -->
+        <if test="filter_ids != null">
+            AND id<![CDATA[>=]]>#{filter_ids}
+        </if>
+        <!-- 小于等于id -->
+        <if test="filter_ide!= null">
+            AND id<![CDATA[<=]]>#{filter_ide}
+        </if>
+
+
+        <if test="likedUserId != null ">
+            AND liked_user_id = #{likedUserId,jdbcType=VARCHAR}
+        </if>
+        <if test="likedUserIdlike != null ">
+            AND liked_user_id like CONCAT('%',#{likedUserIdlike},'%')
+        </if>
+
+
+        <if test="likedPostId != null ">
+            AND liked_post_id = #{likedPostId,jdbcType=VARCHAR}
+        </if>
+        <if test="likedPostIdlike != null ">
+            AND liked_post_id like CONCAT('%',#{likedPostIdlike},'%')
+        </if>
+
+
+        <if test="status != null ">
+            AND status = #{status,jdbcType=INTEGER}
+        </if>
+
+        <!-- 大于等于status -->
+        <if test="filter_statuss != null">
+            AND status<![CDATA[>=]]>#{filter_statuss}
+        </if>
+        <!-- 小于等于status -->
+        <if test="filter_statuse!= null">
+            AND status<![CDATA[<=]]>#{filter_statuse}
+        </if>
+
+
+        <if test="createTime != null ">
+            AND create_time = #{createTime,jdbcType=VARCHAR}
+        </if>
+        <if test="createTimelike != null ">
+            AND create_time like CONCAT('%',#{createTimelike},'%')
+        </if>
+
+
+        <if test="updateTime != null ">
+            AND update_time = #{updateTime,jdbcType=VARCHAR}
+        </if>
+        <if test="updateTimelike != null ">
+            AND update_time like CONCAT('%',#{updateTimelike},'%')
+        </if>
+
+
+    </sql>
+
+    <!-- 设置语句 -->
+    <sql id="set_column">
+        <if test="id != null ">
+            id = #{id,jdbcType=INTEGER},
+        </if>
+        <if test="likedUserId != null ">
+            liked_user_id = #{likedUserId,jdbcType=VARCHAR},
+        </if>
+        <if test="likedPostId != null ">
+            liked_post_id = #{likedPostId,jdbcType=VARCHAR},
+        </if>
+        <if test="status != null ">
+            status = #{status,jdbcType=INTEGER},
+        </if>
+        <if test="createTime != null ">
+            create_time = #{createTime,jdbcType=VARCHAR},
+        </if>
+        <if test="updateTime != null ">
+            update_time = #{updateTime,jdbcType=VARCHAR},
+        </if>
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="find" resultMap="UserLikeResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM USER_LIKE
+        WHERE ID=#{id,jdbcType=BIGINT}
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="findAll" resultMap="UserLikeResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM USER_LIKE
+    </select>
+
+    <!-- 统计记录数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM USER_LIKE
+        <where>
+            <include refid="where_column"/>
+        </where>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.yuan.redis.entity.UserLike">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+        INSERT USER_LIKE
+        (
+        <include refid="base_column"/>
+        )
+        VALUES (<include refid="base_value_column"/>)
+    </insert>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="com.yuan.redis.entity.UserLike">
+        UPDATE USER_LIKE
+        <set>
+            <include refid="set_column"/>
+        </set>
+        WHERE ID = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 删除单条记录 -->
+    <delete id="delete">
+		DELETE	FROM USER_LIKE
+		WHERE	ID = #{id,jdbcType=BIGINT}
+	</delete>
+
+
+    <!-- 删除多条记录-->
+    <delete id="deleteAll">
+        DELETE FROM USER_LIKE
+        WHERE ID IN
+        <foreach item="UserLikeId" index="index" collection="ids" open="(" separator="," close=")">
+            #{UserLikeId}
+        </foreach>
+    </delete>
+
+    <!-- 根据参数查询列表-->
+    <select id="findByParams" resultMap="UserLikeResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM USER_LIKE
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+    </select>
+
+    <!-- 分页查询-->
+    <select id="findByPage" resultMap="UserLikeResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM USER_LIKE
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+    </select>
+
+    <!-- 分页查询-->
+    <select id="findListByPage" resultMap="UserLikeResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM USER_LIKE
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+
+        <if test="order != null and order != ''">
+            order by ${order}
+        </if>
+
+        <if test="pageNumber != null  and pageSize !=null ">
+            limit #{pageNumber,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+
+
+    </select>
+
+
+    <!-- 删除多条记录-->
+    <delete id="deletes">
+        DELETE FROM USER_LIKE
+        <where>
+            <include refid="where_column"/>
+        </where>
+    </delete>
+
+    <!-- 新分页查询-->
+    <select id="findListNewByPage" resultMap="UserLikeResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM USER_LIKE
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+
+        <if test="order != null and order != ''">
+            order by ${order}
+        </if>
+
+        <if test="pageNumber != null  and pageSize !=null ">
+            limit #{pageNumber,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+
+
+    </select>
+
+</mapper>
