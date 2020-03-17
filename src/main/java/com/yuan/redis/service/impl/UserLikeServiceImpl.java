@@ -32,5 +32,15 @@ public class UserLikeServiceImpl implements UserLikeService {
         return userLikeDao.deletes(parameter);
     }
 
+    @Override
+    public Long insert(Object parameter) {
+        return userLikeDao.insert(parameter);
+    }
+
+    @Override
+    public Long update(Object parameter) {
+        return userLikeDao.update(parameter);
+    }
+
 
 }

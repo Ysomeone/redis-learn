@@ -1,5 +1,6 @@
 package com.yuan.redis.config;
 
+import com.yuan.redis.Task.LikeTask;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +17,8 @@ public class QuartzConfig {
 
     @Bean
     public JobDetail quartzDetail() {
-// return JobBuilder.newJob(LikeTask.class).withIdentity(LIKE_TASK_IDENTITY).storeDurably().build();
-        return null;
+        return JobBuilder.newJob(LikeTask.class).withIdentity(LIKE_TASK_IDENTITY).storeDurably().build();
+//        return null;
     }
 
     @Bean

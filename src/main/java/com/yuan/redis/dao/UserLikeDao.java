@@ -16,4 +16,8 @@ public interface UserLikeDao {
     List<UserLike> findListNewByPage(Object parameter);
 
     Long deletes(Object parameter);
+
+    Long insert(Object parameter);
+
+    Long update(Object parameter);
 }

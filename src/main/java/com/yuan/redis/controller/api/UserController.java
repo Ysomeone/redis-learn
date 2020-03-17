@@ -1,8 +1,11 @@
 package com.yuan.redis.controller.api;
+import java.util.Date;
 
 import com.yuan.redis.controller.api.common.Result;
 import com.yuan.redis.entity.User;
+import com.yuan.redis.entity.UserLike;
 import com.yuan.redis.service.RedisService;
+import com.yuan.redis.service.UserLikeService;
 import com.yuan.redis.service.UserService;
 import com.yuan.redis.toolkit.StringUtil;
 import io.swagger.annotations.ApiImplicitParam;
@@ -31,6 +34,8 @@ public class UserController {
     @Resource
     private RedisService redisService;
 
+    @Resource
+    private UserLikeService userLikeService;
 
     @ApiOperation(value = "设置值", notes = "设置值")
     @RequestMapping(value = "/setValue.json", method = RequestMethod.POST)
@@ -39,8 +44,17 @@ public class UserController {
             @ApiImplicitParam(paramType = "query", name = "password", value = "密码", required = true, dataType = "string"),
     })
     public Result<String> setValue(String username, String password) {
+        UserLike userLike = new UserLike();
+        userLike.setLikedUserId("");
+        userLike.setLikedPostId("");
+        userLike.setCreateTime(new Date());
+        userLike.setUpdateTime(new Date());
+        userLike.setStatus(0);
+        userLikeService.insert(userLike);
         return Result.jsonStringOk();
     }
+
+
 
 
 }
