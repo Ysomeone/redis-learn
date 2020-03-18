@@ -30,7 +30,7 @@ public class LikeRedisServiceImpl implements  LikeRedisService {
     @Override
     public void saveLike(String likedUserId, String likedPostId) {
         String key = RedisKeyUtils.getLikedKey(likedUserId, likedPostId);
-        redisTemplate.opsForHash().put(RedisKeyUtils.MAP_KEY_USER, key, LinkedStatusEnum.LIKE.getCode());
+        redisTemplate.opsForHash().put(RedisKeyUtils.MAP_KEY_USER, key, LinkedStatusEnum.LIKE.getCode()+"");
     }
     @Override
     public void unlike(String likedUserId, String likedPostId) {
@@ -64,8 +64,9 @@ public class LikeRedisServiceImpl implements  LikeRedisService {
             String[] split = key.split("::");
             String likedUserId = split[0];
             String likePostId = split[1];
-            Integer value = (Integer) entry.getValue();
-            UserLike userLike = new UserLike(likedUserId, likePostId, value);
+            String value = (String) entry.getValue();
+            Integer num = Integer.valueOf(value);
+            UserLike userLike = new UserLike(likedUserId, likePostId, num);
             list.add(userLike);
             redisTemplate.opsForHash().delete(RedisKeyUtils.MAP_KEY_USER, key);
         }

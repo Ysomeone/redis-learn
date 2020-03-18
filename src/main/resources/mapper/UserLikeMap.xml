@@ -33,7 +33,7 @@
         </if>
 
         <if test="id != null ">
-            AND id = #{id,jdbcType=INTEGER}
+            AND id = #{id,jdbcType=BIGINT}
         </if>
 
         <!-- 大于等于id -->
@@ -97,7 +97,7 @@
     <!-- 设置语句 -->
     <sql id="set_column">
         <if test="id != null ">
-            id = #{id,jdbcType=INTEGER},
+            id = #{id,jdbcType=BIGINT},
         </if>
         <if test="likedUserId != null ">
             liked_user_id = #{likedUserId,jdbcType=VARCHAR},

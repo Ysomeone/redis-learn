@@ -18,14 +18,13 @@ public class QuartzConfig {
     @Bean
     public JobDetail quartzDetail() {
         return JobBuilder.newJob(LikeTask.class).withIdentity(LIKE_TASK_IDENTITY).storeDurably().build();
-//        return null;
     }
 
     @Bean
     public Trigger quartzTrigger() {
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
                 .withIntervalInSeconds(10)
-                .withIntervalInHours(2)
+//                .withIntervalInHours(2)
                 .repeatForever();
         return TriggerBuilder.newTrigger().forJob(quartzDetail())
                 .withIdentity(LIKE_TASK_IDENTITY)

@@ -4,6 +4,7 @@ import java.util.Date;
 import com.yuan.redis.controller.api.common.Result;
 import com.yuan.redis.entity.User;
 import com.yuan.redis.entity.UserLike;
+import com.yuan.redis.service.LikeRedisService;
 import com.yuan.redis.service.RedisService;
 import com.yuan.redis.service.UserLikeService;
 import com.yuan.redis.service.UserService;
@@ -23,6 +24,7 @@ import java.util.HashMap;
  * @author yuan
  */
 @RestController
+@RequestMapping("/api/")
 public class UserController {
 
     @Resource
@@ -35,22 +37,27 @@ public class UserController {
     private RedisService redisService;
 
     @Resource
+    private LikeRedisService likeRedisService;
+
+    @Resource
     private UserLikeService userLikeService;
 
     @ApiOperation(value = "设置值", notes = "设置值")
     @RequestMapping(value = "/setValue.json", method = RequestMethod.POST)
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "query", name = "username", value = "用户名", required = true, dataType = "string"),
-            @ApiImplicitParam(paramType = "query", name = "password", value = "密码", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "likedUserId", value = "用户名", dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "likedPostId", value = "密码", dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "status", value = "状态", dataType = "int")
     })
-    public Result<String> setValue(String username, String password) {
-        UserLike userLike = new UserLike();
-        userLike.setLikedUserId("");
-        userLike.setLikedPostId("");
-        userLike.setCreateTime(new Date());
-        userLike.setUpdateTime(new Date());
-        userLike.setStatus(0);
-        userLikeService.insert(userLike);
+    public Result<String> setValue(String likedUserId, String likedPostId,Integer status) {
+//        UserLike userLike = new UserLike();
+//        userLike.setLikedUserId(likedUserId);
+//        userLike.setLikedPostId(likedPostId);
+//        userLike.setCreateTime(new Date());
+//        userLike.setUpdateTime(new Date());
+//        userLike.setStatus(status);
+//        userLikeService.insert(userLike);
+        likeRedisService.saveLike(likedUserId,likedPostId);
         return Result.jsonStringOk();
     }
 
