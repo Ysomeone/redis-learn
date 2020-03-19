@@ -24,7 +24,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        throw new ApiException(ApiConstants.SESSIONIDEXCEPTION, "sessionId异常");
+//        throw new ApiException(ApiConstants.SESSIONIDEXCEPTION, "sessionId异常");
+        return true;
     }
 
 
