@@ -1,5 +1,9 @@
 package com.yuan.redis.service.impl;
 
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
+import com.mysql.cj.util.TimeUtil;
 import com.yuan.redis.service.RedisService;
 import com.yuan.redis.toolkit.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +12,13 @@ import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.print.DocFlavor;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Author yuan
@@ -24,6 +31,12 @@ public class RedisServiceImpl implements RedisService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    private Lock lock = new ReentrantLock();
+
+    public static BloomFilter<String> bloomFilter =
+            BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), 100000, 0.00001);
+
 
     /**
      * 最终加强分布式锁
@@ -505,5 +518,112 @@ public class RedisServiceImpl implements RedisService {
     public Cursor<ZSetOperations.TypedTuple<String>> zScan(String key, ScanOptions options) {
         return stringRedisTemplate.opsForZSet().scan(key, options);
     }
+
+    /**
+     * 缓存击穿，雪崩解决，使用线程锁，保证同一时刻只能有同一种key值能够进行db数据获取
+     *
+     * @param key
+     * @return
+     * @throws InterruptedException
+     */
+    public String cacheBreakdown_1(String key) throws InterruptedException {
+        String value = stringRedisTemplate.opsForValue().get(key);
+        if (StringUtils.isEmpty(value)) {
+            return value;
+        }
+        if (lock.tryLock()) {
+            String dataBaseValue;
+            try {
+                dataBaseValue = "数据库中的值";
+                System.out.println("互斥锁--获取数据库中的值");
+                stringRedisTemplate.opsForValue().set(key, dataBaseValue);
+            } finally {
+                lock.unlock();
+            }
+            return dataBaseValue;
+        }
+        TimeUnit.SECONDS.sleep(5)
+        ;
+        return cacheBreakdown_1(key);
+    }
+
+    /**
+     * 缓存穿透 设置空对象
+     *
+     * @param key 缓存键
+     * @return
+     */
+    public String cachePenetrate_1(String key) {
+        String value = stringRedisTemplate.opsForValue().get(key);
+        if ("".equals(value)) {
+            return null;
+        }
+        if (value != null) {
+            return value;
+        }
+        String dataBaseValue = "数据库的值";
+        System.out.println("空对象 -- 获取数据库中的值");
+        if (dataBaseValue == null) {
+            stringRedisTemplate.opsForValue().set(key, "", 60, TimeUnit.MINUTES);
+        } else {
+            stringRedisTemplate.opsForValue().set(key, dataBaseValue, 60, TimeUnit.MINUTES);
+        }
+        return dataBaseValue;
+    }
+
+    /**
+     * 分布式锁，保证同一时刻只能同一种key值能够进行db数据的获取
+     *
+     * @param key
+     * @param localKey
+     * @return
+     */
+    public String cacheBreakDown_2(String key, String localKey) {
+        System.out.println("线程开始");
+        String value = stringRedisTemplate.opsForValue().get(key);
+        if (value != null) {
+            return value;
+        }
+        Boolean isSuccess = stringRedisTemplate.opsForValue().setIfAbsent(localKey, "easy");
+        System.out.println(Thread.currentThread().getName() + "isSuccess:" + isSuccess);
+        if (isSuccess) {
+            String dataBaseValue = "数据库中的值";
+            System.out.println("分布式锁--获取数据库中的值");
+            stringRedisTemplate.opsForValue().set(key, dataBaseValue, 60, TimeUnit.MINUTES);
+            return dataBaseValue;
+        } else {
+            try {
+                System.out.println(Thread.currentThread().getName() + " 开始等待");
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return cachePenetrate_1(key);
+        }
+    }
+
+    /**
+     * 缓存穿透  布隆过滤器
+     *
+     * @param key 缓存键
+     * @return
+     */
+    public String cachePenetrate_2(String key) {
+        if (bloomFilter.mightContain(key)) {
+            String value = stringRedisTemplate.opsForValue().get(key);
+            if (value != null) {
+                return value;
+            }
+            String dataBaseValue = "数据库中的值";
+            System.out.println("布隆过滤器--获取数据库中的值");
+            stringRedisTemplate.opsForValue().set(key, dataBaseValue, 60, TimeUnit.MINUTES);
+            return dataBaseValue;
+        } else {
+            System.out.println("该key不存在");
+            return null;
+        }
+    }
+
+
 
 }
