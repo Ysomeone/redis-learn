@@ -1,6 +1,7 @@
 package com.yuan.redis.controller.api;
 import java.util.Date;
 
+import com.yuan.redis.authorization.Authorization;
 import com.yuan.redis.controller.api.common.Result;
 import com.yuan.redis.entity.User;
 import com.yuan.redis.entity.UserLike;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +27,7 @@ import java.util.HashMap;
  */
 @RestController
 @RequestMapping("/api/")
+@Authorization
 public class UserController {
 
     @Resource
@@ -49,7 +52,7 @@ public class UserController {
             @ApiImplicitParam(paramType = "query", name = "likedPostId", value = "密码", dataType = "string"),
             @ApiImplicitParam(paramType = "query", name = "status", value = "状态", dataType = "int")
     })
-    public Result<String> setValue(String likedUserId, String likedPostId,Integer status) {
+    public Result<String> setValue(@Param(value="likedUserId") String likedUserId, @Param(value="likedPostId")String likedPostId,  @Param(value="status")Integer status) {
 //        UserLike userLike = new UserLike();
 //        userLike.setLikedUserId(likedUserId);
 //        userLike.setLikedPostId(likedPostId);

@@ -18,7 +18,7 @@ import java.util.Random;
  * @Date 2020/3/22 15:19
  * @Version 1.0
  */
-@Service
+//@Service
 public class RedpackServiceImpl {
 
     @Resource
