@@ -3,35 +3,38 @@ package com.yuan.redis.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yuan.redis.entity.RedisKeys;
 import com.yuan.redis.service.LuaScript;
+import com.yuan.redis.service.RedpackService;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @Author yuan
  * @Date 2020/3/22 15:19
  * @Version 1.0
  */
-//@Service
-public class RedpackServiceImpl {
+@Service
+public class RedpackServiceImpl implements RedpackService {
 
     @Resource
-    private StringRedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
 
-    public void genRedpack(long orderId, int redpackCount) {
-        Boolean flag = redisTemplate.hasKey(RedisKeys.getHbPoolKey(orderId));
+    @Resource
+    private RedisTemplate redisTemplate;
+
+
+
+    @Override
+    public void genRedpack(long orderId, int redpackCount, int totalAmount) {
+        Boolean flag = stringRedisTemplate.hasKey(RedisKeys.getHbPoolKey(orderId));
         if (!flag) {
-            /**
-             * 红包金额(分为单位)
-             */
-            int totalAmount = 2000;
             int[] redpacks = doPartintionRedpack(totalAmount, redpackCount);
             String[] list = new String[redpacks.length];
             for (int i = 0; i < redpacks.length; i++) {
@@ -43,20 +46,14 @@ public class RedpackServiceImpl {
                 jsonObject.put("amount", redpacks[i]);
                 list[i] = jsonObject.toJSONString();
             }
-            redisTemplate.opsForList().leftPushAll(RedisKeys.getHbPoolKey(orderId), list);
+            stringRedisTemplate.opsForList().leftPushAll(RedisKeys.getHbPoolKey(orderId), list);
         }
 
     }
 
 
-    /**
-     * 划分红包
-     *
-     * @param totalAmount  红包总额 单位：分
-     * @param redPackCount 红包数量
-     * @return
-     */
-    private int[] doPartintionRedpack(int totalAmount, int redPackCount) {
+    @Override
+    public int[] doPartintionRedpack(int totalAmount, int redPackCount) {
         Random random = new Random();
         /**
          * 每个人至少分到一分钱,如果有2000分，6人，随机得到五个小于1994（2000-6）的数
@@ -76,25 +73,28 @@ public class RedpackServiceImpl {
             } else if (i == posArray.length) {
                 redpacks[i] = randomMax - posArray[i - 1] + 1;
             } else {
-                redpacks[i] = posArray[i] - posArray[i + 1] + 1;
+                redpacks[i] = posArray[i] - posArray[i - 1] + 1;
             }
         }
         return redpacks;
     }
 
-    public String snatchRedpack(long userId, long orderId) {
-//        Object object = jedisUtils.eval(LuaScript.getHbLua,4,
-//                RedisKeys.getHbPoolKey(orderId),//
-//                RedisKeys.getDetailListKey(orderId),//
-//                RedisKeys.getHbRdKey(orderId),String.valueOf(userId));
 
-//        return (String) object;
-//        List<String> keyList = new ArrayList();
-//        keyList.add("count");
-//        keyList.add("rate.limiting:127.0.0.1");
-//        redisTemplate.execute(LuaScript.getHbLua,);
-        return "";
+    @Override
+    public String snatchRedpack(long userId, long orderId) {
+        DefaultRedisScript<String> redisScript = new DefaultRedisScript<>();
+        redisScript.setResultType(String.class);
+        redisScript.setScriptText(LuaScript.getHbLua);
+        List<String> keyList = new ArrayList();
+        keyList.add(RedisKeys.getHbPoolKey(orderId));
+        keyList.add(RedisKeys.getDetailListKey(orderId));
+        keyList.add(RedisKeys.getHbRdKey(orderId));
+        keyList.add(String.valueOf(userId));
+        Object result = stringRedisTemplate.execute(redisScript, keyList);
+        return (String) result;
     }
+
+
 
 
 }
