@@ -252,6 +252,14 @@
 		AND sale = #{sale,jdbcType=INTEGER}
 	</update>
 
+	<select id="selectByPrimaryKeyForUpdate"  >
+		select
+		<include refid="base_column" />
+		from stock
+		where id = #{id,jdbcType=INTEGER}
+		FOR UPDATE
+	</select>
+
 
 
 

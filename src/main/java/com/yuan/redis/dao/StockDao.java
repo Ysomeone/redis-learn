@@ -20,5 +20,6 @@ public interface StockDao extends GenericDao<Stock, Long> {
 
     Long updateByOptimistic(Object parameter);
 
+    Stock selectByPrimaryKeyForUpdate(Long id);
 
 }
