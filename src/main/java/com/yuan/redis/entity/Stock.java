@@ -25,7 +25,7 @@ public class Stock implements GenericEntity {
      *
      */
     @ApiModelProperty(value = "", required = true)
-    private Integer id;
+    private Long id;
 
     /**
      * 名称

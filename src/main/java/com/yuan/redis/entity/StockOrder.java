@@ -25,13 +25,13 @@ public class StockOrder implements GenericEntity {
      *
      */
     @ApiModelProperty(value = "", required = true)
-    private Integer id;
+    private Long id;
 
     /**
      * 库存ID
      */
     @ApiModelProperty(value = "库存ID", required = true)
-    private Integer sid;
+    private Long sid;
 
     /**
      * 商品名称

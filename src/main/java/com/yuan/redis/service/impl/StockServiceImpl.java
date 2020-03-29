@@ -22,7 +22,6 @@ import java.util.List;
  * @Transactional
  */
 @Service
-@Log4j
 public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements StockService {
 
     @Autowired
@@ -52,7 +51,7 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
     }
 
     @Override
-    public Long createWrongOrder(Long sid) {
+    public Long createWrongOrder(Long sid)throws Exception {
         /**
          * 校验库存
          */
@@ -69,7 +68,7 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
     }
 
     @Override
-    public Long createOptimisticOrder(Long sid) {
+    public Long createOptimisticOrder(Long sid) throws Exception{
         /**
          * 校验库存
          */
@@ -87,7 +86,7 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
 
 
     @Override
-    public Long createPessimisticOrder(Long sid) {
+    public Long createPessimisticOrder(Long sid)throws Exception {
         /**
          * 校验库存（悲观锁 for update）
          */
@@ -105,10 +104,10 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
     }
 
 
-    public Stock checkStockForUpdate(Long sid) {
+    public Stock checkStockForUpdate(Long sid)throws Exception {
         Stock stock = stockDao.selectByPrimaryKeyForUpdate(sid);
         if (stock.getSale().equals(stock.getCount())) {
-            throw new RuntimeException("库存不足");
+            throw new Exception("库存不足");
         }
         return stock;
     }
@@ -121,10 +120,10 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
      * @return
      * @throws Exception
      */
-    public Stock checkStock(Long sid) {
+    public Stock checkStock(Long sid)throws Exception {
         Stock stock = stockDao.find(sid);
         if (stock.getSale().equals(stock.getCount())) {
-            throw new RuntimeException("库存不足");
+            throw new Exception("库存不足");
         }
         return stock;
     }
@@ -136,6 +135,7 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
      */
     public void saleStock(Stock stock) {
         stock.setSale(stock.getSale() + 1);
+        stock.setCount(stock.getCount()-1);
         stockDao.update(stock);
     }
 
@@ -158,13 +158,13 @@ public class StockServiceImpl extends GenericServiceImpl<Stock, Long> implements
      *
      * @param stock
      */
-    private void saleStockOptimistic(Stock stock) {
+    private void saleStockOptimistic(Stock stock) throws Exception{
         /**
          * 查询数据库，尝试更新库存
          */
         long count = stockDao.updateByOptimistic(stock);
         if (count == 0) {
-            throw new RuntimeException("乐观锁并发更新库存失败");
+            throw new Exception("乐观锁并发更新库存失败");
         }
     }
 

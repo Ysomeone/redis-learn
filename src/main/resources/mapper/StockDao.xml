@@ -246,7 +246,7 @@
 	<update id="updateByOptimistic" parameterType="com.yuan.redis.entity.Stock">
 		update stock
 		<set>
-			sale = sale + 1,
+			sale = sale + 1
 		</set>
 		WHERE id = #{id,jdbcType=INTEGER}
 		AND sale = #{sale,jdbcType=INTEGER}

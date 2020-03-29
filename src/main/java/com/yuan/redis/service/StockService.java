@@ -23,7 +23,7 @@ public interface StockService extends GenericService<Stock, Long> {
      * @param sid 库存ID
      * @return 订单ID
      */
-    Long createWrongOrder(Long sid);
+    Long createWrongOrder(Long sid)throws Exception;
 
 
     /**
@@ -33,7 +33,7 @@ public interface StockService extends GenericService<Stock, Long> {
      * @return
      * @throws Exception
      */
-    Long createOptimisticOrder(Long sid);
+    Long createOptimisticOrder(Long sid)throws Exception;
 
     /**
      * 创建订单 悲观锁 for update
@@ -42,5 +42,5 @@ public interface StockService extends GenericService<Stock, Long> {
      * @return
      * @throws Exception
      */
-    Long createPessimisticOrder(Long sid);
+    Long createPessimisticOrder(Long sid) throws Exception;
 }
