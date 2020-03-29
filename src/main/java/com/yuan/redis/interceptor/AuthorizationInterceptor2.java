@@ -1,8 +1,6 @@
 package com.yuan.redis.interceptor;
 
 import com.yuan.redis.authorization.Authorization;
-import com.yuan.redis.controller.api.common.ApiConstants;
-import com.yuan.redis.controller.api.exception.ApiException;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -60,7 +58,7 @@ public class AuthorizationInterceptor2 extends HandlerInterceptorAdapter {
          * 如果验证token失败，并且方法或类注明了Authorization,返回错误
          */
         if (method.getAnnotation(Authorization.class) != null || handlerMethod.getBeanType().getAnnotation(Authorization.class) != null) {
-            throw new ApiException(ApiConstants.SESSIONIDEXCEPTION, "sessionId异常");
+//            throw new ApiException(ApiConstants.SESSIONIDEXCEPTION, "sessionId异常");
         }
         request.setAttribute(REQUEST_CURRENT_KEY, null);
         return true;

@@ -2,12 +2,12 @@ package com.yuan.redis.controller.api;
 
 import com.yuan.redis.authorization.Authorization;
 import com.yuan.redis.controller.api.common.Result;
-import com.yuan.redis.service.*;
+import com.yuan.redis.service.LikeRedisService;
+import com.yuan.redis.service.RedpackService;
 import com.yuan.redis.toolkit.IdWorker;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +22,7 @@ import java.util.concurrent.CyclicBarrier;
  */
 @RestController
 @RequestMapping("/api/user")
-public class UserController {
+public class RedisController {
 
 
 

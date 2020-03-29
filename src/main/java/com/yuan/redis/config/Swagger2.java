@@ -27,7 +27,7 @@ public class Swagger2 {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo()).select()
                 //扫描指定包中的swagger注解
-                .apis(RequestHandlerSelectors.basePackage("com.yuan.redis.controller.api"))
+                .apis(RequestHandlerSelectors.basePackage("com.yuan.redis.controller"))
                 //扫描所有有注解的api，用这种方式更灵活
                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 .build().securitySchemes(security());

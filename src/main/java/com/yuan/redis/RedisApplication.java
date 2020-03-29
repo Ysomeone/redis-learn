@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-@MapperScan("com.yuan.redis.dao")
+@MapperScan({"com.yuan.redis.dao","com.yuan.redis.controller.admin.mapper"})
 public class RedisApplication {
 
 	public static void main(String[] args) {
