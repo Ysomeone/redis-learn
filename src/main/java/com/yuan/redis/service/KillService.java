@@ -1,5 +1,7 @@
 package com.yuan.redis.service;
 
+import com.yuan.redis.controller.api.common.Result;
+
 /**
  * SERVICE - KillOrder(秒杀)
  *
@@ -15,7 +17,7 @@ public interface KillService {
      * @param killActivityId
      * @return
      */
-    Long robGoodsByAopLock(Long userId, Long killActivityId);
+    Result<String> robGoodsByAopLock(Long userId, Long killActivityId) throws Exception;
 
     /**
      * redisson 实现
@@ -24,7 +26,7 @@ public interface KillService {
      * @param killActivityId
      * @return
      */
-    Long robGoodsByRedissonLock(Long userId, Long killActivityId);
+    Result<String> robGoodsByRedissonLock(Long userId, Long killActivityId);
 
     /**
      * redis队列实现
@@ -42,6 +44,6 @@ public interface KillService {
      * @param killActivityId
      * @return
      */
-    Long robGoodsByOptimismLock(Long userId, Long killActivityId);
+    Result<String> robGoodsByOptimismLock(Long userId, Long killActivityId);
 
 }

@@ -102,7 +102,7 @@ public class RedissLockUtil {
      * @param leaseTime 上锁后自动释放锁时间
      * @return
      */
-    public static boolean tyrLock(String lockKey, TimeUnit unit, int waitTime, int leaseTime) {
+    public static boolean tryLock(String lockKey, TimeUnit unit, int waitTime, int leaseTime) {
         RLock lock = redissonClient.getLock(lockKey);
         try {
             return lock.tryLock(waitTime, leaseTime, unit);
