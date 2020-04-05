@@ -17,4 +17,8 @@ public interface ActivityGoodsDao extends GenericDao<ActivityGoods, Long> {
     List<ActivityGoods> findListNewByPage(Object parameter);
 
     Long deletes(Object parameter);
+
+    Long updateByOptimismLock(Object parameter);
+
+    ActivityGoods selectForUpdate(Long id);
 }

@@ -26,5 +26,14 @@ public class Md5Utils {
 	    }
 	    return ret.toString();
 	}
+
+	public static void main(String[] args) {
+		Integer i=null;
+		if(i!=null){
+
+		}
+
+
+	}
   
 }

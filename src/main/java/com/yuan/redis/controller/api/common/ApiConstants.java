@@ -28,4 +28,20 @@ public class ApiConstants {
      * 人数过多，请再次尝试！
      */
     public static final String ERROR100400 = "100400";
+
+    /**
+     * 您的手速过快，请休息下
+     */
+    public static final String ERROR100500 = "100500";
+
+    /**
+     * 您操作过于频繁，请稍后再试
+     */
+    public static final String ERROR100600 = "100600";
+
+
+    /**
+     *  网络异常请求稍后再试
+     */
+    public static final String ERROR100700 = "100700";
 }

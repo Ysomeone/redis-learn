@@ -1,240 +1,276 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
 <mapper namespace="com.yuan.redis.dao.ActivityGoodsDao">
-	
-	<resultMap id="ActivityGoodsResultMap" type="com.yuan.redis.entity.ActivityGoods">
-		<id property="id" column="id"  />
-		<result property="goodsName" column="goods_name" />
-		<result property="goodsNum" column="goods_num" />
-		<result property="createTime" column="create_time" />
-		<result property="version" column="version" />
-	</resultMap>
-	
-	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
-	<sql id="base_column">
+
+    <resultMap id="ActivityGoodsResultMap" type="com.yuan.redis.entity.ActivityGoods">
+        <id property="id" column="id"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="goodsNum" column="goods_num"/>
+        <result property="createTime" column="create_time"/>
+        <result property="version" column="version"/>
+    </resultMap>
+
+    <!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+    <sql id="base_column">
 		 id ,goods_name ,goods_num ,create_time ,version 
 	</sql>
-	
-	<sql id="base_value_column">
+
+    <sql id="base_value_column">
 		 #{id},#{goodsName},#{goodsNum},#{createTime},#{version}
 	</sql>
-	
-	<!-- 定义可重用的WHERE SQL公共代码段，可以包含在其他语句中 -->
-	<sql id="where_column">
-       <if test="ids != null  and ids.size > 0  ">
-			AND ID IN
-			<foreach item="id" index="index" collection="ids" open="("
-				separator="," close=")">
-				#{id}
-			</foreach>
-		</if>
 
-		<if test="id != null ">
-			AND id = #{id,jdbcType=BIGINT}
-		</if>
+    <!-- 定义可重用的WHERE SQL公共代码段，可以包含在其他语句中 -->
+    <sql id="where_column">
+        <if test="ids != null  and ids.size > 0  ">
+            AND ID IN
+            <foreach item="id" index="index" collection="ids" open="("
+                     separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
 
-	    	<!-- 大于等于id -->
-		<if test="filter_ids != null">
-			AND id<![CDATA[>=]]>#{filter_ids}
-		</if>
-		<!-- 小于等于id -->
-	    <if test="filter_ide!= null">
-			AND id<![CDATA[<=]]>#{filter_ide}
-		</if>
+        <if test="id != null ">
+            AND id = #{id,jdbcType=BIGINT}
+        </if>
 
-
-		<if test="goodsName != null ">
-			AND goods_name = #{goodsName,jdbcType=VARCHAR}
-		</if>
-	   <if test="goodsNamelike != null ">
-			AND goods_name like CONCAT('%',#{goodsNamelike},'%')
-		</if>
+        <!-- 大于等于id -->
+        <if test="filter_ids != null">
+            AND id<![CDATA[>=]]>#{filter_ids}
+        </if>
+        <!-- 小于等于id -->
+        <if test="filter_ide!= null">
+            AND id<![CDATA[<=]]>#{filter_ide}
+        </if>
 
 
-
-		<if test="goodsNum != null ">
-			AND goods_num = #{goodsNum,jdbcType=INTEGER}
-		</if>
-
-	    	<!-- 大于等于goods_num -->
-		<if test="filter_goodsNums != null">
-			AND goods_num<![CDATA[>=]]>#{filter_goodsNums}
-		</if>
-		<!-- 小于等于goods_num -->
-	    <if test="filter_goodsNume!= null">
-			AND goods_num<![CDATA[<=]]>#{filter_goodsNume}
-		</if>
+        <if test="goodsName != null ">
+            AND goods_name = #{goodsName,jdbcType=VARCHAR}
+        </if>
+        <if test="goodsNamelike != null ">
+            AND goods_name like CONCAT('%',#{goodsNamelike},'%')
+        </if>
 
 
-		<if test="createTime != null ">
-			AND create_time = #{createTime,jdbcType=VARCHAR}
-		</if>
-	   <if test="createTimelike != null ">
-			AND create_time like CONCAT('%',#{createTimelike},'%')
-		</if>
+        <if test="goodsNum != null ">
+            AND goods_num = #{goodsNum,jdbcType=INTEGER}
+        </if>
+
+        <!-- 大于等于goods_num -->
+        <if test="filter_goodsNums != null">
+            AND goods_num<![CDATA[>=]]>#{filter_goodsNums}
+        </if>
+        <!-- 小于等于goods_num -->
+        <if test="filter_goodsNume!= null">
+            AND goods_num<![CDATA[<=]]>#{filter_goodsNume}
+        </if>
 
 
-
-		<if test="version != null ">
-			AND version = #{version,jdbcType=BIGINT}
-		</if>
-
-	    	<!-- 大于等于version -->
-		<if test="filter_versions != null">
-			AND version<![CDATA[>=]]>#{filter_versions}
-		</if>
-		<!-- 小于等于version -->
-	    <if test="filter_versione!= null">
-			AND version<![CDATA[<=]]>#{filter_versione}
-		</if>
+        <if test="createTime != null ">
+            AND create_time = #{createTime,jdbcType=VARCHAR}
+        </if>
+        <if test="createTimelike != null ">
+            AND create_time like CONCAT('%',#{createTimelike},'%')
+        </if>
 
 
-	</sql>
-	
-	<!-- 设置语句 -->
-	<sql id="set_column">
-		<if test="id != null ">
-			id = #{id,jdbcType=BIGINT},
-		</if>
-		<if test="goodsName != null ">
-			goods_name = #{goodsName,jdbcType=VARCHAR},
-		</if>
-		<if test="goodsNum != null ">
-			goods_num = #{goodsNum,jdbcType=INTEGER},
-		</if>
-		<if test="createTime != null ">
-			create_time = #{createTime,jdbcType=VARCHAR},
-		</if>
-		<if test="version != null ">
-			version = #{version,jdbcType=BIGINT},
-		</if>
-	</sql>
+        <if test="version != null ">
+            AND version = #{version,jdbcType=BIGINT}
+        </if>
 
-	<!-- 根据ID查询 -->
-	<select id="find" resultMap="ActivityGoodsResultMap">
-		SELECT	<include refid="base_column" />
-		FROM	KILL_ACTIVITY_GOODS
-		WHERE	ID=#{id,jdbcType=BIGINT}
-	</select>
-	
-	<!-- 查询所有 -->
-	<select id="findAll" resultMap="ActivityGoodsResultMap">
-		SELECT	<include refid="base_column" />
-		FROM	KILL_ACTIVITY_GOODS
-	</select>
-	
-	<!-- 统计记录数 -->
-	<select id="count" resultType="long">
-		SELECT COUNT(*) FROM KILL_ACTIVITY_GOODS
-		<where> 
-			<include refid="where_column" />
-		</where>
-	</select>
-	
-	<!-- 插入 -->
-	<insert id="insert" parameterType="com.yuan.redis.entity.ActivityGoods">
-		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">  
-	          SELECT LAST_INSERT_ID() AS ID    
-	    </selectKey>  
-		INSERT KILL_ACTIVITY_GOODS 
-				(<include refid="base_column" /> )
-		VALUES	(<include refid="base_value_column" />)
-	</insert>
-	
-	<!-- 修改 -->
-	<update id="update" parameterType="com.yuan.redis.entity.ActivityGoods">
-		UPDATE	KILL_ACTIVITY_GOODS
-		<set>
-			<include refid="set_column" />
-		</set>
-		WHERE	ID = #{id,jdbcType=BIGINT}
-	</update>
-	
-	<!-- 删除单条记录 -->
-	<delete id="delete">
+        <!-- 大于等于version -->
+        <if test="filter_versions != null">
+            AND version<![CDATA[>=]]>#{filter_versions}
+        </if>
+        <!-- 小于等于version -->
+        <if test="filter_versione!= null">
+            AND version<![CDATA[<=]]>#{filter_versione}
+        </if>
+
+
+    </sql>
+
+    <!-- 设置语句 -->
+    <sql id="set_column">
+        <if test="id != null ">
+            id = #{id,jdbcType=BIGINT},
+        </if>
+        <if test="goodsName != null ">
+            goods_name = #{goodsName,jdbcType=VARCHAR},
+        </if>
+        <if test="goodsNum != null ">
+            goods_num = #{goodsNum,jdbcType=INTEGER},
+        </if>
+        <if test="createTime != null ">
+            create_time = #{createTime,jdbcType=VARCHAR},
+        </if>
+        <if test="version != null ">
+            version = #{version,jdbcType=BIGINT},
+        </if>
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="find" resultMap="ActivityGoodsResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM KILL_ACTIVITY_GOODS
+        WHERE ID=#{id,jdbcType=BIGINT}
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="findAll" resultMap="ActivityGoodsResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM KILL_ACTIVITY_GOODS
+    </select>
+
+    <!-- 统计记录数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM KILL_ACTIVITY_GOODS
+        <where>
+            <include refid="where_column"/>
+        </where>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.yuan.redis.entity.ActivityGoods">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+        INSERT KILL_ACTIVITY_GOODS
+        (
+        <include refid="base_column"/>
+        )
+        VALUES (<include refid="base_value_column"/>)
+    </insert>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="com.yuan.redis.entity.ActivityGoods">
+        UPDATE KILL_ACTIVITY_GOODS
+        <set>
+            <include refid="set_column"/>
+        </set>
+        WHERE ID = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 删除单条记录 -->
+    <delete id="delete">
 		DELETE	FROM KILL_ACTIVITY_GOODS
 		WHERE	ID = #{id,jdbcType=BIGINT}
 	</delete>
-	
-	
-	<!-- 删除多条记录-->
-	<delete id="deleteAll">
-		DELETE	FROM KILL_ACTIVITY_GOODS
-		WHERE	ID	IN
-    	<foreach item="ActivityGoodsId" index="index" collection="ids" open="(" separator="," close=")">
-	  		#{ActivityGoodsId} 
-		</foreach>
-	</delete>
-	
-	<!-- 根据参数查询列表-->
-	<select id="findByParams" resultMap="ActivityGoodsResultMap">
-		SELECT	<include refid="base_column" />
-		FROM 	KILL_ACTIVITY_GOODS
-		<where> 1=1
-			<include refid="where_column" />
-		</where>
-	</select>
-	
-	<!-- 分页查询-->
-	<select id="findByPage" resultMap="ActivityGoodsResultMap">
-		SELECT
-		<include refid="base_column" />
-		FROM KILL_ACTIVITY_GOODS
-		<where> 1=1
-			<include refid="where_column" />
-		</where>
-	</select>
 
-       <!-- 分页查询-->
-       <select id="findListByPage" resultMap="ActivityGoodsResultMap">
-		SELECT
-		<include refid="base_column" />
-		FROM KILL_ACTIVITY_GOODS
-		<where> 1=1
-			<include refid="where_column" />
-		</where>
-					
-	     <if test="order != null and order != ''">
-		order by  ${order}
-	     </if>
-	     
-		<if test="pageNumber != null  and pageSize !=null ">
-			limit  #{pageNumber,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
-	     </if>
-			
-		
-	</select>
-	
-	
-		<!-- 删除多条记录-->
-	<delete id="deletes">
-		DELETE	FROM KILL_ACTIVITY_GOODS
-		<where> 
-			<include refid="where_column" />
-		</where>
-	</delete>
-	
- <!-- 新分页查询-->
-       <select id="findListNewByPage" resultMap="ActivityGoodsResultMap">
-		SELECT
-		<include refid="base_column" />
-		FROM KILL_ACTIVITY_GOODS
-		<where> 1=1
-			<include refid="where_column" />
-		</where>
-					
-	     <if test="order != null and order != ''">
-		order by  ${order}
-	     </if>
-	     
-		<if test="pageNumber != null  and pageSize !=null ">
-			limit  #{pageNumber,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
-	     </if>
-			
-		
-	</select>
-	
+
+    <!-- 删除多条记录-->
+    <delete id="deleteAll">
+        DELETE FROM KILL_ACTIVITY_GOODS
+        WHERE ID IN
+        <foreach item="ActivityGoodsId" index="index" collection="ids" open="(" separator="," close=")">
+            #{ActivityGoodsId}
+        </foreach>
+    </delete>
+
+    <!-- 根据参数查询列表-->
+    <select id="findByParams" resultMap="ActivityGoodsResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM KILL_ACTIVITY_GOODS
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+    </select>
+
+    <!-- 分页查询-->
+    <select id="findByPage" resultMap="ActivityGoodsResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM KILL_ACTIVITY_GOODS
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+    </select>
+
+    <!-- 分页查询-->
+    <select id="findListByPage" resultMap="ActivityGoodsResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM KILL_ACTIVITY_GOODS
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+
+        <if test="order != null and order != ''">
+            order by ${order}
+        </if>
+
+        <if test="pageNumber != null  and pageSize !=null ">
+            limit #{pageNumber,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+
+
+    </select>
+
+
+    <!-- 删除多条记录-->
+    <delete id="deletes">
+        DELETE FROM KILL_ACTIVITY_GOODS
+        <where>
+            <include refid="where_column"/>
+        </where>
+    </delete>
+
+    <!-- 新分页查询-->
+    <select id="findListNewByPage" resultMap="ActivityGoodsResultMap">
+        SELECT
+        <include refid="base_column"/>
+        FROM KILL_ACTIVITY_GOODS
+        <where>1=1
+            <include refid="where_column"/>
+        </where>
+
+        <if test="order != null and order != ''">
+            order by ${order}
+        </if>
+
+        <if test="pageNumber != null  and pageSize !=null ">
+            limit #{pageNumber,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+
+
+    </select>
+
+
+    <!-- 乐观锁修改 -->
+    <update id="updateByOptimismLock" parameterType="com.yuan.redis.entity.ActivityGoods">
+        UPDATE KILL_ACTIVITY_GOODS
+        <set>
+            <!-- 设置语句 -->
+            <if test="id != null ">
+                id = #{id,jdbcType=BIGINT},
+            </if>
+            <if test="goodsName != null ">
+                goods_name = #{goodsName,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsNum != null ">
+                goods_num = #{goodsNum,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null ">
+                create_time = #{createTime,jdbcType=VARCHAR},
+            </if>
+            <if test="version != null ">
+                version = version+1
+            </if>
+        </set>
+        WHERE ID = #{id,jdbcType=BIGINT} and version =#{version,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectForUpdate"  resultMap="ActivityGoodsResultMap" >
+        select
+        <include refid="base_column" />
+        from KILL_ACTIVITY_GOODS
+        where id = #{id,jdbcType=INTEGER}
+        FOR UPDATE
+    </select>
+
 </mapper>

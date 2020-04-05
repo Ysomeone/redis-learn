@@ -2,6 +2,7 @@ package com.yuan.redis.service.impl;
 
 import com.yuan.redis.controller.api.common.ApiConstants;
 import com.yuan.redis.controller.api.common.Result;
+import com.yuan.redis.controller.api.exception.ApiException;
 import com.yuan.redis.dao.ActivityGoodsDao;
 import com.yuan.redis.dao.KillOrderDao;
 import com.yuan.redis.entity.ActivityGoods;
@@ -12,6 +13,7 @@ import com.yuan.redis.toolkit.RedissLockUtil;
 import org.apache.shiro.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -28,20 +30,20 @@ public class KillServiceImpl implements KillService {
     private ActivityGoodsDao activityGoodsDao;
 
     @Override
-    public Result<String>  robGoodsByAopLock(Long userId, Long killActivityId) throws Exception {
+    public Result<String> robGoodsByAopLock(Long userId, Long killActivityId) throws Exception {
         ActivityGoods activityGoods = activityGoodsDao.find(killActivityId);
         if (activityGoods == null) {
-			return Result.jsonStringError(ApiConstants.ERROR100100, "该活动不存在");
+            return Result.jsonStringError(ApiConstants.ERROR100100, "该活动不存在");
         }
         List<KillOrder> orderList = killOrderDao.findByParams(Paramap.create().put("userId", userId).put("activityId", killActivityId));
         if (!CollectionUtils.isEmpty(orderList)) {
-			return Result.jsonStringError(ApiConstants.ERROR100200, "您已经抢到该商品");
+            return Result.jsonStringError(ApiConstants.ERROR100200, "您已经抢到该商品");
         }
         Integer goodsNum = activityGoods.getGoodsNum();
         if (goodsNum > 0) {
             saveOrderAndUpdateNum(userId, killActivityId, activityGoods);
         } else {
-			return Result.jsonStringError(ApiConstants.ERROR100300, "该商品已经抢完");
+            return Result.jsonStringError(ApiConstants.ERROR100300, "该商品已经抢完");
         }
         return Result.jsonStringOk();
     }
@@ -66,9 +68,9 @@ public class KillServiceImpl implements KillService {
                 } else {
                     return Result.jsonStringError(ApiConstants.ERROR100300, "该商品已经抢完");
                 }
-            }else{
-            	return Result.jsonStringError(ApiConstants.ERROR100400,"人数过多，请再次尝试！");
-			}
+            } else {
+                return Result.jsonStringError(ApiConstants.ERROR100400, "人数过多，请再次尝试！");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -85,8 +87,42 @@ public class KillServiceImpl implements KillService {
     }
 
     @Override
-    public Result<String> robGoodsByOptimismLock(Long userId, Long killActivityId) {
-        return null;
+    public Result<String> robGoodsByOptimismLock(Long userId, Long killActivityId) throws ApiException {
+        ActivityGoods activityGoods = activityGoodsDao.find(killActivityId);
+        if (activityGoods == null) {
+            return Result.jsonStringError(ApiConstants.ERROR100100, "该活动不存在");
+        }
+        List<KillOrder> orderList = killOrderDao.findByParams(Paramap.create().put("userId", userId).put("activityId", killActivityId));
+        if (!CollectionUtils.isEmpty(orderList)) {
+            return Result.jsonStringError(ApiConstants.ERROR100200, "您已经抢到该商品");
+        }
+        Integer goodsNum = activityGoods.getGoodsNum();
+        if (goodsNum > 0) {
+            saveOrderAndUpdateNumByOptimismLock(userId, killActivityId, activityGoods);
+        } else {
+            return Result.jsonStringError(ApiConstants.ERROR100300, "该商品已经抢完");
+        }
+        return Result.jsonStringOk();
+    }
+
+    @Override
+    @Transactional
+    public Result<String> robGoodsByForUpdate(Long userId, Long killActivityId) throws ApiException {
+        ActivityGoods activityGoods = activityGoodsDao.selectForUpdate(killActivityId);
+        if (activityGoods == null) {
+            return Result.jsonStringError(ApiConstants.ERROR100100, "该活动不存在");
+        }
+        List<KillOrder> orderList = killOrderDao.findByParams(Paramap.create().put("userId", userId).put("activityId", killActivityId));
+        if (!CollectionUtils.isEmpty(orderList)) {
+            return Result.jsonStringError(ApiConstants.ERROR100200, "您已经抢到该商品");
+        }
+        Integer goodsNum = activityGoods.getGoodsNum();
+        if (goodsNum > 0) {
+            saveOrderAndUpdateNumByForUpdate(userId, killActivityId, activityGoods);
+        } else {
+            return Result.jsonStringError(ApiConstants.ERROR100300, "该商品已经抢完");
+        }
+        return Result.jsonStringOk();
     }
 
     /**
@@ -98,7 +134,7 @@ public class KillServiceImpl implements KillService {
      */
     private void saveOrderAndUpdateNum(Long userId, Long killActivityId, ActivityGoods activityGoods) {
         activityGoods.setGoodsNum(activityGoods.getGoodsNum() - 1);
-        activityGoodsDao.insert(activityGoods);
+        activityGoodsDao.update(activityGoods);
         KillOrder killOrder = new KillOrder();
         killOrder.setActivityId(killActivityId);
         killOrder.setUserId(userId);
@@ -106,4 +142,50 @@ public class KillServiceImpl implements KillService {
         killOrder.setStatus(1);
         killOrderDao.insert(killOrder);
     }
+
+    /**
+     * 修改库存数保存订单（乐观锁实现）
+     *
+     * @param userId
+     * @param killActivityId
+     * @param activityGoods
+     */
+    private void saveOrderAndUpdateNumByOptimismLock(Long userId, Long killActivityId, ActivityGoods activityGoods) throws ApiException {
+        activityGoods.setGoodsNum(activityGoods.getGoodsNum() - 1);
+        Long num = activityGoodsDao.updateByOptimismLock(activityGoods);
+        if (num > 0) {
+            KillOrder killOrder = new KillOrder();
+            killOrder.setActivityId(killActivityId);
+            killOrder.setUserId(userId);
+            killOrder.setCreateTime(new Timestamp(System.currentTimeMillis()).toString());
+            killOrder.setStatus(1);
+            killOrderDao.insert(killOrder);
+        } else {
+            throw new ApiException(ApiConstants.ERROR100700, "人数过多，请再次尝试！");
+        }
+    }
+
+    /**
+     * 修改库存数保存订单（悲观锁实现）
+     *
+     * @param userId
+     * @param killActivityId
+     * @param activityGoods
+     * @throws ApiException
+     */
+    public void saveOrderAndUpdateNumByForUpdate(Long userId, Long killActivityId, ActivityGoods activityGoods) throws ApiException {
+        activityGoods.setGoodsNum(activityGoods.getGoodsNum() - 1);
+        Long num = activityGoodsDao.update(activityGoods);
+        if (num > 0) {
+            KillOrder killOrder = new KillOrder();
+            killOrder.setActivityId(killActivityId);
+            killOrder.setUserId(userId);
+            killOrder.setCreateTime(new Timestamp(System.currentTimeMillis()).toString());
+            killOrder.setStatus(1);
+            killOrderDao.insert(killOrder);
+        } else {
+            throw new ApiException(ApiConstants.ERROR100700, "人数过多，请再次尝试！");
+        }
+    }
+
 }

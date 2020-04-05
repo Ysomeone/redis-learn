@@ -3,7 +3,6 @@ package com.yuan.redis.controller.api.exception;
 import com.yuan.redis.controller.api.common.Result;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author yuan
  */
-@RestController
 @RestControllerAdvice
 public class ControllerAdvice {
 

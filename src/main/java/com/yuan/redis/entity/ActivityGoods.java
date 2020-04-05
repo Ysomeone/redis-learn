@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import javax.persistence.*;
 
 /**
  * Entity - 秒杀活动商品
@@ -18,7 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(description = "秒杀活动商品")
-public class ActivityGoods implements GenericEntity {
+@Entity
+@Table(name = "kill_activity_goods")
+public class ActivityGoods implements GenericEntity{
 
 	private static final long serialVersionUID = 5081846432919091193L;
 
@@ -40,6 +43,8 @@ public class ActivityGoods implements GenericEntity {
 	
 	/** 版本号 */
 	@ApiModelProperty(value = "版本号", required = true)
+	@Version
+	@Column(name = "version", nullable = true, length = 19)
 	private Long version;
 	
 }

@@ -2,12 +2,16 @@ package com.yuan.redis.interceptor;
 
 import com.yuan.redis.authorization.CacheLock;
 import com.yuan.redis.authorization.CacheParam;
+import com.yuan.redis.controller.api.common.ApiConstants;
+import com.yuan.redis.controller.api.exception.ApiException;
 import com.yuan.redis.toolkit.Md5Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -20,21 +24,20 @@ import java.lang.reflect.Parameter;
 /**
  * 通过aop利用redis分布式锁完成  锁的过期时间为1秒
  *
- *
- *
  * @Author yuan
  * @Date 2020/3/29 15:57
  * @Version 1.0
  */
 @Aspect
 @Slf4j
+@Configuration
 public class LockMethodTnterceptor {
 
     @Autowired
     private RedisTemplate redisTemplate;
 
-
-    public Object interceptor(ProceedingJoinPoint pjp) {
+    @Around("execution(public * *(..)) && @annotation(com.yuan.redis.authorization.CacheLock)")
+    public Object interceptor(ProceedingJoinPoint pjp) throws ApiException {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Method method = signature.getMethod();
         CacheLock lock = method.getAnnotation(CacheLock.class);
@@ -42,6 +45,8 @@ public class LockMethodTnterceptor {
             /**
              * 网络异常请求稍后再试
              */
+            throw new ApiException(ApiConstants.ERROR100700, "人数过多，请再次尝试！");
+
         }
         String lockKey = getLockKey(pjp);
         Boolean success = redisTemplate.opsForValue().setIfAbsent(lockKey, "1");
@@ -51,33 +56,33 @@ public class LockMethodTnterceptor {
                 /**
                  * 人数过多，请再次尝试
                  */
+                throw new ApiException(ApiConstants.ERROR100400, "人数过多，请再次尝试！");
             } else {
                 /**
                  * 您的手速过快，请休息下
                  */
+                throw new ApiException(ApiConstants.ERROR100500, "您的手速过快，请休息下");
             }
-            if (lock.prefix().equals("kill:robGoodsByAopLock:robGoods")) {
-                redisTemplate.expire(lockKey, 1, lock.timeUnit());
-            } else {
-                redisTemplate.expire(lockKey, lock.expire(), lock.timeUnit());
-            }
-
-            try {
-                return pjp.proceed();
-            } catch (Throwable throwable) {
-                /**
-                 * 您操作过于频繁，请稍后再试
-                 */
-            }finally{
-                if(!lock.prefix().equals("kill:robGoodsByAopLock:robGoods")){
-                    redisTemplate.delete(lockKey);
-                }
-            }
-
+        }
+        if (lock.prefix().equals("kill:robGoodsByAopLock:robGoods")) {
+            redisTemplate.expire(lockKey, 1, lock.timeUnit());
+        } else {
+            redisTemplate.expire(lockKey, lock.expire(), lock.timeUnit());
         }
 
+        try {
+            return pjp.proceed();
+        } catch (Throwable throwable) {
+            /**
+             * 您操作过于频繁，请稍后再试
+             */
+            throw new ApiException(ApiConstants.ERROR100600, "您操作过于频繁，请稍后再试");
+        } finally {
+            if (!lock.prefix().equals("kill:robGoodsByAopLock:robGoods")) {
+                redisTemplate.delete(lockKey);
+            }
+        }
 
-        return null;
     }
 
     public static String getLockKey(ProceedingJoinPoint pjp) {
@@ -111,6 +116,8 @@ public class LockMethodTnterceptor {
             }
 
         }
+        System.out.println("builder.toString()"+builder.toString());
+        System.out.println("lockAnnotation.prefix()  Md5Utils.MD5(builder.toString())"+ lockAnnotation.prefix() + ":" + Md5Utils.MD5(builder.toString()));
         return lockAnnotation.prefix() + ":" + Md5Utils.MD5(builder.toString());
     }
 
