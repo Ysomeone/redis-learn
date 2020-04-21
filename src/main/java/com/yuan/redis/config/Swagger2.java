@@ -20,15 +20,18 @@ import java.util.List;
  */
 @Configuration
 @EnableSwagger2
-@ConditionalOnProperty(prefix = "swagger",value = {"enable"},havingValue = "true")
+@ConditionalOnProperty(prefix = "swagger", value = {"enable"}, havingValue = "true")
 public class Swagger2 {
     @Bean
     public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        /**
+         * .host("域名") 如果通过域名访问文档，需要加上这个，以免在文档请求因为跨域问题而请求不了
+         */
+        return new Docket(DocumentationType.SWAGGER_2)//.host("域名")
                 .apiInfo(apiInfo()).select()
                 //扫描指定包中的swagger注解
-                .apis(RequestHandlerSelectors.basePackage("com.yuan.redis.controller"))
-                //扫描所有有注解的api，用这种方式更灵活
+                .apis(RequestHandlerSelectors.basePackage("com.yuan.redis.controller.api"))
+                // 扫描所有有注解的api，用这种方式更灵活
                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 .build().securitySchemes(security());
     }

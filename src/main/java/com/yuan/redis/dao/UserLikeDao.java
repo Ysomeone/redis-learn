@@ -20,4 +20,6 @@ public interface UserLikeDao {
     Long insert(Object parameter);
 
     Long update(Object parameter);
+
+    int updateUser(Object parameter);
 }

@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class KillController {
     @Resource
     private KillService killService;
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KillController.class);
 
     //Guava令牌桶：每秒放行10个请求
     RateLimiter rateLimiter = RateLimiter.create(10);
@@ -43,7 +43,7 @@ public class KillController {
          * 模拟用户id
          */
         int i = new Random().nextInt(500);
-        long userId = (long) i;
+        long userId = i;
         return killService.robGoodsByForUpdate(userId, killActivityId);
     }
 
@@ -63,7 +63,7 @@ public class KillController {
          * 模拟用户id
          */
         int i = new Random().nextInt(100);
-        long userId = (long) i;
+        long userId = i;
         return killService.robGoodsByOptimismLock(userId, killActivityId);
     }
 
@@ -92,7 +92,12 @@ public class KillController {
          * 模拟用户id
          */
         int i = new Random().nextInt(100);
-        long userId = (long) i;
+        long userId = i;
+
+
+
+
+
         return killService.robGoodsByRedissonLock(userId, killActivityId);
     }
 

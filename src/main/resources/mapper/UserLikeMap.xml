@@ -244,5 +244,9 @@
 
 
     </select>
+    <select id="updateUser" resultType="int">
+
+    </select>
+
 
 </mapper>

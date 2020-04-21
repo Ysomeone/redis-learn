@@ -1,6 +1,8 @@
 package com.yuan.redis.interceptor;
 
 import com.yuan.redis.authorization.Authorization;
+import com.yuan.redis.controller.api.common.ApiConstants;
+import com.yuan.redis.controller.api.exception.ApiException;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -22,14 +24,9 @@ public class AuthorizationInterceptor2 extends HandlerInterceptorAdapter {
 
 
     /**
-     * 存放鉴权信息的Header名称，默认是Authorization
+     * 存放鉴权信息的Header名称
      */
-    private String httpHeaderName = "Authorization";
-
-    /**
-     * 鉴权信息的无用前缀，默认为空
-     */
-    private String httpHeaderPrefix = "";
+    private String httpHeaderName = "sessionId";
 
 
     @Override
@@ -43,14 +40,13 @@ public class AuthorizationInterceptor2 extends HandlerInterceptorAdapter {
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Method method = handlerMethod.getMethod();
         String token = request.getHeader(httpHeaderName);
-        if (token != null && token.startsWith(httpHeaderPrefix) && token.length() > 0) {
-            token = token.substring(httpHeaderPrefix.length());
+        if (token != null && token.length() > 0) {
             /**
              * 根据token拿key,如果不为空则返回true
              */
             String key = "";
             if (key != null) {
-                request.setAttribute(REQUEST_CURRENT_KEY, "");
+                request.setAttribute(REQUEST_CURRENT_KEY, key);
                 return true;
             }
         }
@@ -58,7 +54,7 @@ public class AuthorizationInterceptor2 extends HandlerInterceptorAdapter {
          * 如果验证token失败，并且方法或类注明了Authorization,返回错误
          */
         if (method.getAnnotation(Authorization.class) != null || handlerMethod.getBeanType().getAnnotation(Authorization.class) != null) {
-//            throw new ApiException(ApiConstants.SESSIONIDEXCEPTION, "sessionId异常");
+            throw new ApiException(ApiConstants.SESSIONIDEXCEPTION, "sessionId异常");
         }
         request.setAttribute(REQUEST_CURRENT_KEY, null);
         return true;
