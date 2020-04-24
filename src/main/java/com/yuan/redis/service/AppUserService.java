@@ -11,7 +11,7 @@ import java.util.List;
  * @author
  * @version 2.0
  */
-public interface UserService extends GenericService<User, Long> {
+public interface AppUserService extends GenericService<User, Long> {
 
     List<User> findListByPage(Object parameter);
 

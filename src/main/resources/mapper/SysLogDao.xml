@@ -3,23 +3,24 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<mapper namespace="com.yuan.redis.dao.UserDao">
+<mapper namespace="com.yuan.redis.dao.SysLogDao">
 	
-	<resultMap id="UserResultMap" type="com.yuan.redis.entity.User">
+	<resultMap id="SysLogResultMap" type="com.yuan.redis.entity.SysLog">
 		<id property="id" column="id"  />
-		<result property="username" column="username" />
-		<result property="password" column="password" />
+		<result property="userId" column="user_id" />
+		<result property="module" column="module" />
+		<result property="data" column="data" />
+		<result property="memo" column="memo" />
 		<result property="createTime" column="create_time" />
-		<result property="updateTime" column="update_time" />
 	</resultMap>
 	
 	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
 	<sql id="base_column">
-		 id ,username ,password ,create_time ,update_time 
+		 id ,user_id ,module ,data ,memo ,create_time 
 	</sql>
 	
 	<sql id="base_value_column">
-		 #{id},#{username},#{password},#{createTime},#{updateTime}
+		 #{id},#{userId},#{module},#{data},#{memo},#{createTime}
 	</sql>
 	
 	<!-- 定义可重用的WHERE SQL公共代码段，可以包含在其他语句中 -->
@@ -46,20 +47,43 @@
 		</if>
 
 
-		<if test="username != null ">
-			AND username = #{username,jdbcType=VARCHAR}
+		<if test="userId != null ">
+			AND user_id = #{userId,jdbcType=BIGINT}
 		</if>
-	   <if test="usernamelike != null ">
-			AND username like CONCAT('%',#{usernamelike},'%')
+
+	    	<!-- 大于等于user_id -->
+		<if test="filter_userIds != null">
+			AND user_id<![CDATA[>=]]>#{filter_userIds}
+		</if>
+		<!-- 小于等于user_id -->
+	    <if test="filter_userIde!= null">
+			AND user_id<![CDATA[<=]]>#{filter_userIde}
+		</if>
+
+
+		<if test="module != null ">
+			AND module = #{module,jdbcType=VARCHAR}
+		</if>
+	   <if test="modulelike != null ">
+			AND module like CONCAT('%',#{modulelike},'%')
 		</if>
 
 
 
-		<if test="password != null ">
-			AND password = #{password,jdbcType=VARCHAR}
+		<if test="data != null ">
+			AND data = #{data,jdbcType=VARCHAR}
 		</if>
-	   <if test="passwordlike != null ">
-			AND password like CONCAT('%',#{passwordlike},'%')
+	   <if test="datalike != null ">
+			AND data like CONCAT('%',#{datalike},'%')
+		</if>
+
+
+
+		<if test="memo != null ">
+			AND memo = #{memo,jdbcType=VARCHAR}
+		</if>
+	   <if test="memolike != null ">
+			AND memo like CONCAT('%',#{memolike},'%')
 		</if>
 
 
@@ -78,20 +102,6 @@
 
 
 
-		<if test="updateTime != null ">
-			AND update_time = #{updateTime,jdbcType=TIMESTAMP}
-		</if>
-	    	<!-- 大于等于update_time -->
-		<if test="filter_updateTimes != null">
-			AND date_format(update_time,'%Y%m%d')<![CDATA[>=]]>#{filter_updateTimes}
-		</if>
-		<!-- 小于等于update_time -->
-	    <if test="filter_updateTimee!= null">
-			AND date_format(update_time,'%Y%m%d')<![CDATA[<=]]>#{filter_updateTimee}
-		</if>
-
-
-
 	</sql>
 	
 	<!-- 设置语句 -->
@@ -99,54 +109,57 @@
 		<if test="id != null ">
 			id = #{id,jdbcType=BIGINT},
 		</if>
-		<if test="username != null ">
-			username = #{username,jdbcType=VARCHAR},
+		<if test="userId != null ">
+			user_id = #{userId,jdbcType=BIGINT},
 		</if>
-		<if test="password != null ">
-			password = #{password,jdbcType=VARCHAR},
+		<if test="module != null ">
+			module = #{module,jdbcType=VARCHAR},
+		</if>
+		<if test="data != null ">
+			data = #{data,jdbcType=VARCHAR},
+		</if>
+		<if test="memo != null ">
+			memo = #{memo,jdbcType=VARCHAR},
 		</if>
 		<if test="createTime != null ">
 			create_time = #{createTime,jdbcType=TIMESTAMP},
 		</if>
-		<if test="updateTime != null ">
-			update_time = #{updateTime,jdbcType=TIMESTAMP},
-		</if>
 	</sql>
 
 	<!-- 根据ID查询 -->
-	<select id="find" resultMap="UserResultMap">
+	<select id="find" resultMap="SysLogResultMap">
 		SELECT	<include refid="base_column" />
-		FROM	T_USER
+		FROM	SYS_LOG
 		WHERE	ID=#{id,jdbcType=BIGINT}
 	</select>
 	
 	<!-- 查询所有 -->
-	<select id="findAll" resultMap="UserResultMap">
+	<select id="findAll" resultMap="SysLogResultMap">
 		SELECT	<include refid="base_column" />
-		FROM	T_USER
+		FROM	SYS_LOG
 	</select>
 	
 	<!-- 统计记录数 -->
 	<select id="count" resultType="long">
-		SELECT COUNT(*) FROM T_USER
+		SELECT COUNT(*) FROM SYS_LOG
 		<where> 
 			<include refid="where_column" />
 		</where>
 	</select>
 	
 	<!-- 插入 -->
-	<insert id="insert" parameterType="com.yuan.redis.entity.User">
+	<insert id="insert" parameterType="com.yuan.redis.entity.SysLog">
 		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">  
 	          SELECT LAST_INSERT_ID() AS ID    
 	    </selectKey>  
-		INSERT T_USER 
+		INSERT SYS_LOG 
 				(<include refid="base_column" /> )
 		VALUES	(<include refid="base_value_column" />)
 	</insert>
 	
 	<!-- 修改 -->
-	<update id="update" parameterType="com.yuan.redis.entity.User">
-		UPDATE	T_USER
+	<update id="update" parameterType="com.yuan.redis.entity.SysLog">
+		UPDATE	SYS_LOG
 		<set>
 			<include refid="set_column" />
 		</set>
@@ -155,44 +168,44 @@
 	
 	<!-- 删除单条记录 -->
 	<delete id="delete">
-		DELETE	FROM T_USER
+		DELETE	FROM SYS_LOG
 		WHERE	ID = #{id,jdbcType=BIGINT}
 	</delete>
 	
 	
 	<!-- 删除多条记录-->
 	<delete id="deleteAll">
-		DELETE	FROM T_USER
+		DELETE	FROM SYS_LOG
 		WHERE	ID	IN
-    	<foreach item="UserId" index="index" collection="ids" open="(" separator="," close=")">
-	  		#{UserId} 
+    	<foreach item="SysLogId" index="index" collection="ids" open="(" separator="," close=")">
+	  		#{SysLogId} 
 		</foreach>
 	</delete>
 	
 	<!-- 根据参数查询列表-->
-	<select id="findByParams" resultMap="UserResultMap">
+	<select id="findByParams" resultMap="SysLogResultMap">
 		SELECT	<include refid="base_column" />
-		FROM 	T_USER
+		FROM 	SYS_LOG
 		<where> 1=1
 			<include refid="where_column" />
 		</where>
 	</select>
 	
 	<!-- 分页查询-->
-	<select id="findByPage" resultMap="UserResultMap">
+	<select id="findByPage" resultMap="SysLogResultMap">
 		SELECT
 		<include refid="base_column" />
-		FROM T_USER
+		FROM SYS_LOG
 		<where> 1=1
 			<include refid="where_column" />
 		</where>
 	</select>
 
        <!-- 分页查询-->
-       <select id="findListByPage" resultMap="UserResultMap">
+       <select id="findListByPage" resultMap="SysLogResultMap">
 		SELECT
 		<include refid="base_column" />
-		FROM T_USER
+		FROM SYS_LOG
 		<where> 1=1
 			<include refid="where_column" />
 		</where>
@@ -211,17 +224,17 @@
 	
 		<!-- 删除多条记录-->
 	<delete id="deletes">
-		DELETE	FROM T_USER
+		DELETE	FROM SYS_LOG
 		<where> 
 			<include refid="where_column" />
 		</where>
 	</delete>
 	
  <!-- 新分页查询-->
-       <select id="findListNewByPage" resultMap="UserResultMap">
+       <select id="findListNewByPage" resultMap="SysLogResultMap">
 		SELECT
 		<include refid="base_column" />
-		FROM T_USER
+		FROM SYS_LOG
 		<where> 1=1
 			<include refid="where_column" />
 		</where>

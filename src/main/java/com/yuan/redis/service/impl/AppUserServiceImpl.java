@@ -2,7 +2,7 @@ package com.yuan.redis.service.impl;
 
 import com.yuan.redis.dao.UserDao;
 import com.yuan.redis.entity.User;
-import com.yuan.redis.service.UserService;
+import com.yuan.redis.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * @version 2.0
  */
 @Service
-public class UserServiceImpl extends GenericServiceImpl<User, Long> implements UserService {
+public class AppUserServiceImpl extends GenericServiceImpl<User, Long> implements AppUserService {
 	
 	@Autowired
 	private UserDao userDao;

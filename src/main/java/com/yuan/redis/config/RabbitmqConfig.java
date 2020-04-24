@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.HashMap;
+
 /**
  * RabbitMQ自定义注入Bean配置
  *
@@ -105,7 +107,7 @@ public class RabbitmqConfig {
      */
     @Bean
     public DirectExchange basicExchange() {
-        return new DirectExchange(env.getProperty("mq.basic.info.exchage.name"), true, false);
+        return new DirectExchange(env.getProperty("mq.basic.info.exchange.name"), true, false);
     }
 
     /**
@@ -138,20 +140,20 @@ public class RabbitmqConfig {
     /**
      * 创建消息模型
      */
-    @Bean(name="fanoutQueueOne")
-    public Queue fanoutQueueOne() {
-        return new Queue(env.getProperty("mq.fanout.queue.one.name"), true);
-    }
-
-    @Bean(name="fanoutQueueTwo")
-    public Queue fanoutQueueTwo(){
-        return new Queue(env.getProperty("mq.fanout.queue.two.name"),true);
-    }
-
-    @Bean
-    public FanoutExchange fanoutExchange(){
-        return new FanoutExchange(env.getProperty("mq.fanout.exchange.name"),true,false);
-    }
+//    @Bean(name="fanoutQueueOne")
+//    public Queue fanoutQueueOne() {
+//        return new Queue(env.getProperty("mq.fanout.queue.one.name"), true);
+//    }
+//
+//    @Bean(name="fanoutQueueTwo")
+//    public Queue fanoutQueueTwo(){
+//        return new Queue(env.getProperty("mq.fanout.queue.two.name"),true);
+//    }
+//
+//    @Bean
+//    public FanoutExchange fanoutExchange(){
+//        return new FanoutExchange(env.getProperty("mq.fanout.exchange.name"),true,false);
+//    }
 
     @Bean(name="loginQueue")
     public Queue loginQueue(){
@@ -167,6 +169,33 @@ public class RabbitmqConfig {
     public Binding loginBinding(){
         return BindingBuilder.bind(loginQueue()).to(loginExchange()).with(env.getProperty("mq.login.routing.key.name"));
     }
+
+
+    /**
+     * 用户下单支付超时-RabbitMQ 死信队列消息模型构建
+     */
+
+    @Bean
+    public Queue orderDeadQueue(){
+        HashMap<String,Object> hashMap = new HashMap();
+           hashMap.put("x-dead-letter-exchange", env.getProperty("mq.order.dead.exchange.name"));
+           hashMap.put("x-dead-letter-routing-key",env.getProperty("mq.order.dead.routing.key.name"));
+        /**
+         * 设定TTL,单位为ms，在这里为了方便测试，设置为10s
+         */
+        hashMap.put("x-message-ttl",10000);
+        return new Queue(env.getProperty("mq.order.dead.queue.name"),true,false,false,hashMap);
+
+    }
+
+
+
+
+
+
+
+
+
 
 
 
