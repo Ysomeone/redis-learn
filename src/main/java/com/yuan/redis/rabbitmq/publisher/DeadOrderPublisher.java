@@ -32,7 +32,7 @@ public class DeadOrderPublisher {
      * 发送用户下单记录id的消息入死信队列
      * @param orderId
      */
-    public void sendMsg(Integer orderId){
+    public void sendMsg(Long orderId){
         try {
             //设置消息的传输格式-Json格式
             rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
@@ -50,7 +50,7 @@ public class DeadOrderPublisher {
                     //设置消息的持久化策略
                     messageProperties.setDeliveryMode(MessageDeliveryMode.PERSISTENT);
                     //设置消息头-即直接指定发送的消息所属的对象类型
-                    messageProperties.setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME,Integer.class);
+                    messageProperties.setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME,Long.class);
                     //返回消息实例
                     return message;
                 }
