@@ -1,4 +1,4 @@
-package com.yuan.redis.toolkit;
+package com.yuan.redis.toolkit.bloomFilter;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;
