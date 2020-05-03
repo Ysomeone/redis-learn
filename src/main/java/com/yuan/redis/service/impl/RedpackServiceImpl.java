@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.yuan.redis.entity.RedisKeys;
 import com.yuan.redis.service.LuaScript;
 import com.yuan.redis.service.RedpackService;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -28,7 +26,6 @@ public class RedpackServiceImpl implements RedpackService {
 
     @Resource
     private RedisTemplate redisTemplate;
-
 
 
     @Override
@@ -93,6 +90,33 @@ public class RedpackServiceImpl implements RedpackService {
         Object result = stringRedisTemplate.execute(redisScript, keyList);
         return (String) result;
     }
+
+
+    public static int getLegth(String str) {
+        int length = str.length();
+        int right = 0, left = 0;
+        Set<Character> set = new HashSet<>();
+        int maxSubStrLength = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (!set.contains(str.charAt(i))) {
+                set.add(str.charAt(i));
+                right++;
+                maxSubStrLength = Math.max(maxSubStrLength, set.size());
+            } else {
+                set.remove(str.charAt(left));
+            }
+        }
+        return maxSubStrLength;
+    }
+
+    public static void main(String[] args) {
+        String yuan="asdfasdfsdafasasdfghj";
+        int legth = getLegth(yuan);
+        System.out.println(legth);
+
+    }
+
+
 
 
 

@@ -1,9 +1,9 @@
 package com.yuan.redis.controller.api;
 
 
+import com.yuan.redis.authorization.RateLimit;
 import com.yuan.redis.controller.api.common.Result;
 import com.yuan.redis.entity.Paramap;
-import com.yuan.redis.entity.Phone;
 import com.yuan.redis.entity.Test;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,42 +41,21 @@ public class TestController {
         return Result.jsonStringOk(t);
     }
 
-    public static void main(String[] args) {
+    @ApiOperation(value = "测试限流", notes = "测试限流")
+    @RequestMapping(value = "/testRateLimiter.json", method = RequestMethod.POST)
+    @ApiResponses({@ApiResponse(code = 5000001, message = "参数错误")})
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "password", value = "密码", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "name", value = "用户名", required = true, dataType = "String")
+    })
+    @RateLimit(perSecond =10, timeOut = 100)
+    public Result<Test>  testRateLimiter(String password, String name) {
 
-
-        Phone phone = new Phone();
-        phone.setId(0);
-        phone.setName("");
-        phone.setRanking("");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return Result.jsonStringOk();
     }
+
+
+
+
+
 }
