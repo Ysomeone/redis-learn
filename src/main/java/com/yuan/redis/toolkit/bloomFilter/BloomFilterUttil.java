@@ -1,9 +1,7 @@
 package com.yuan.redis.toolkit.bloomFilter;
 
-import com.google.common.base.Charsets;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
-import com.google.common.util.concurrent.RateLimiter;
 
 /**
  * @Author yuan
@@ -12,31 +10,28 @@ import com.google.common.util.concurrent.RateLimiter;
  */
 public class BloomFilterUttil {
     public static void main(String[] args) {
+        int num=100000;
         /**
-         * 总数量
+         * 默认误判率为3%
          */
-        int total=100000;
-        BloomFilter<CharSequence> bf = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), total);
-        /**
-         * 初始化100000条数据到过滤器中
-         */
-        for(int i=0;i<total;i++){
-            bf.put(""+i);
+        BloomFilter<Integer> filter = BloomFilter.create(Funnels.integerFunnel(), num);
+
+        for(int i=0;i<num;i++){
+            filter.put(i);
         }
         int count=0;
-        for (int i = 0; i < total + 10000; i++) {
-            if(bf.mightContain(""+i)){
+        /**
+         * 那不存在的数据进行测试
+         */
+        for (int i = num; i < num + 10000; i++) {
+            if(filter.mightContain(i)){
                 count++;
             }
         }
-        System.out.println("已匹配数量"+count);
-
-
-        RateLimiter limiter = RateLimiter.create(2);
-
-        for(int i = 1; i < 10; i  ++) {
-            double waitTime = limiter.acquire(i);
-            System.out.println("cutTime=" + System.currentTimeMillis() + " acq:" + i + " waitTime:" + waitTime);
-        }
+        /**
+         * 测试结果（一共误判了286个，误判率：0.0286）
+         */
+        System.out.println("一共误判了"+count);
+        System.out.println("误判率："+(double)count/10000);
     }
 }

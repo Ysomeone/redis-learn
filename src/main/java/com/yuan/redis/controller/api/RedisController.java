@@ -2,9 +2,9 @@ package com.yuan.redis.controller.api;
 
 import com.yuan.redis.authorization.Authorization;
 import com.yuan.redis.controller.api.common.Result;
+import com.yuan.redis.entity.Paramap;
 import com.yuan.redis.service.LikeRedisService;
 import com.yuan.redis.service.RedpackService;
-import com.yuan.redis.toolkit.IdWorker;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 /**
  * @author yuan
@@ -52,34 +50,34 @@ public class RedisController {
             @ApiImplicitParam(paramType = "query", name = "totalAmount", value = "钱包金额", dataType = "int")
     })
     public Result<String> testRedPack(Long orderId,int repackCount,int totalAmount) throws Exception {
-        redpackService.genRedpack(orderId, 5,totalAmount);
-        IdWorker idWorker = new IdWorker();
-        int N = 100;
-        CyclicBarrier barrier = new CyclicBarrier(N);
-        for (int i = 0; i < N; i++) {
-            new Thread(() -> {
-                long userId = idWorker.nextId();
-                try {
-                    System.out.println("用户" + userId + "准备抢红包");
-                    barrier.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
-                String result = redpackService.snatchRedpack(userId, orderId);
-                if ("0".equals(result)) {
-                    System.out.println("用户" + userId + "未抢到红包，原因：红包已领完");
-                } else if ("1".equals(result)) {
-                    System.out.println("用户" + userId + "未抢到红包，原因：红包已领过");
-                } else {
-                    System.out.println("用户" + userId + "抢到红包：" + result);
-                }
-            }, "thread" + i).start();
-        }
-        Thread.sleep(Integer.MAX_VALUE);
-
-        return Result.jsonStringOk();
+//        redpackService.genRedpack(orderId, 5,totalAmount);
+//        IdWorker idWorker = new IdWorker();
+//        int N = 100;
+//        CyclicBarrier barrier = new CyclicBarrier(N);
+//        for (int i = 0; i < N; i++) {
+//            new Thread(() -> {
+//                long userId = idWorker.nextId();
+//                try {
+//                    System.out.println("用户" + userId + "准备抢红包");
+//                    barrier.await();
+//                } catch (2 e) {
+//                    e.printStackTrace();
+//                } catch (BrokenBarrierException e) {
+//                    e.printStackTrace();
+//                }
+//                String result = redpackService.snatchRedpack(userId, orderId);
+//                if ("0".equals(result)) {
+//                    System.out.println("用户" + userId + "未抢到红包，原因：红包已领完");
+//                } else if ("1".equals(result)) {
+//                    System.out.println("用户" + userId + "未抢到红包，原因：红包已领过");
+//                } else {
+//                    System.out.println("用户" + userId + "抢到红包：" + result);
+//                }
+//            }, "thread" + i).start();
+//        }
+//        Thread.sleep(Integer.MAX_VALUE);
+        String limit = redpackService.limit();
+        return Result.jsonStringOk(Paramap.create().put("limit",limit));
     }
 
 

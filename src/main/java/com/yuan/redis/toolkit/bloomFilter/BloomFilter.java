@@ -72,11 +72,11 @@ public class BloomFilter {
     public static void main(String[] args) {
         //向布隆过滤器中添加值
         BloomFilter b = new BloomFilter();
-        b.addValue("www.baidu.com");
-        b.addValue("www.sohu.com");
+        b.addValue("jks");
+        b.addValue("sdf");
         //判断是否存在
-        System.out.println(b.contains("www.baidu.com"));
-        System.out.println(b.contains("www.sina.com"));
+        System.out.println(b.contains("jks"));
+        System.out.println(b.contains("as"));
     }
 
 }

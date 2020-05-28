@@ -44,4 +44,11 @@ public class ApiConstants {
      *  网络异常请求稍后再试
      */
     public static final String ERROR100700 = "100700";
+
+    /**
+     * 该用户已经被注册
+     */
+    public static final String ERROR100800 = "100800";
+
+
 }

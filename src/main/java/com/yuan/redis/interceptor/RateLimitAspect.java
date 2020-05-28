@@ -23,16 +23,11 @@ import java.lang.reflect.Method;
 @Aspect
 @Configuration
 public class RateLimitAspect {
-    private RateLimiter rateLimiter = RateLimiter.create(10);
 
-    /**
-     * 带有指定注解切入
-     */
+    private RateLimiter rateLimiter = RateLimiter.create(Double.MAX_VALUE);
+
     @Around("execution(public * *(..)) && @annotation(com.yuan.redis.authorization.RateLimit)")
     public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
-        log.info("方法：" + pjp.getSignature().getName());
-        log.info(pjp.getArgs());
-
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Method method = signature.getMethod();
         if (method.isAnnotationPresent(RateLimit.class)) {
@@ -44,6 +39,4 @@ public class RateLimitAspect {
         }
         return pjp.proceed();
     }
-
-
 }

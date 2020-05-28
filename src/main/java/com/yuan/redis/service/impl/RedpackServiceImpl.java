@@ -91,6 +91,20 @@ public class RedpackServiceImpl implements RedpackService {
         return (String) result;
     }
 
+   @Override
+    public String limit() {
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+        redisScript.setResultType(Long.class);
+        redisScript.setScriptText(LuaScript.limit);
+        List<String> keyList = new ArrayList();
+        keyList.add("yuan");
+        keyList.add("10");
+        keyList.add("2");
+
+       Long result = stringRedisTemplate.execute(redisScript, keyList);
+        return result+"";
+    }
+
 
     public static int getLegth(String str) {
         int length = str.length();
@@ -110,15 +124,11 @@ public class RedpackServiceImpl implements RedpackService {
     }
 
     public static void main(String[] args) {
-        String yuan="asdfasdfsdafasasdfghj";
+        String yuan = "asdfasdfsdafasasdfghj";
         int legth = getLegth(yuan);
         System.out.println(legth);
 
     }
-
-
-
-
 
 
 }

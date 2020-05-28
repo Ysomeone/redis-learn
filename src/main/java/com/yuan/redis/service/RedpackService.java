@@ -34,5 +34,6 @@ public interface RedpackService {
      */
     String snatchRedpack(long userId, long orderId);
 
+     String limit() ;
 
 }

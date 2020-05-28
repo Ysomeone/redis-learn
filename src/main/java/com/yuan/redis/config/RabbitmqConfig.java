@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.HashMap;
+
 /**
  * RabbitMQ自定义注入Bean配置
  *
@@ -168,53 +170,53 @@ public class RabbitmqConfig {
 //    }
 //
 //
-//    /**
-//     * 用户下单支付超时-RabbitMQ 死信队列消息模型构建
-//     */
-//
-//    @Bean
-//    public Queue orderDeadQueue() {
-//        HashMap<String, Object> hashMap = new HashMap();
-//        hashMap.put("x-dead-letter-exchange", env.getProperty("mq.order.dead.exchange.name"));
-//        hashMap.put("x-dead-letter-routing-key", env.getProperty("mq.order.dead.routing.key.name"));
-//        /**
-//         * 设定TTL,单位为ms，在这里为了方便测试，设置为10s
-//         */
-//        hashMap.put("x-message-ttl", 10000);
-//        return new Queue(env.getProperty("mq.order.dead.queue.name"), true, false, false, hashMap);
-//
-//    }
-//
-//    //创建“基本消息模型”的基本交换机 - 面向生产者
-//    @Bean
-//    public TopicExchange orderProducerExchange() {
-//        return new TopicExchange(env.getProperty("mq.producer.order.exchange.name"), true, false);
-//    }
-//
-//    //创建“基本消息模型”的基本绑定-基本交换机+基本路由 - 面向生产者
-//    @Bean
-//    public Binding orderProducerBinding() {
-//        return BindingBuilder.bind(orderDeadQueue()).to(orderProducerExchange()).with(env.getProperty("mq.producer.order.routing.key.name"));
-//    }
-//
-//
-//    //创建真正队列 - 面向消费者
-//    @Bean
-//    public Queue realOrderConsumerQueue() {
-//        return new Queue(env.getProperty("mq.consumer.order.real.queue.name"), true);
-//    }
-//
-//    //创建死信交换机
-//    @Bean
-//    public TopicExchange basicOrderDeadExchange() {
-//        return new TopicExchange(env.getProperty("mq.order.dead.exchange.name"), true, false);
-//    }
-//
-//    //创建死信路由及其绑定
-//    @Bean
-//    public Binding basicOrderDeadBinding() {
-//        return BindingBuilder.bind(realOrderConsumerQueue()).to(basicOrderDeadExchange()).with(env.getProperty("mq.order.dead.routing.key.name"));
-//    }
+    /**
+     * 用户下单支付超时-RabbitMQ 死信队列消息模型构建
+     */
+
+    @Bean
+    public Queue orderDeadQueue() {
+        HashMap<String, Object> hashMap = new HashMap();
+        hashMap.put("x-dead-letter-exchange", env.getProperty("mq.order.dead.exchange.name"));
+        hashMap.put("x-dead-letter-routing-key", env.getProperty("mq.order.dead.routing.key.name"));
+        /**
+         * 设定TTL,单位为ms，在这里为了方便测试，设置为10s
+         */
+        hashMap.put("x-message-ttl", 10000);
+        return new Queue(env.getProperty("mq.order.dead.queue.name"), true, false, false, hashMap);
+
+    }
+
+    //创建“基本消息模型”的基本交换机 - 面向生产者
+    @Bean
+    public TopicExchange orderProducerExchange() {
+        return new TopicExchange(env.getProperty("mq.producer.order.exchange.name"), true, false);
+    }
+
+    //创建“基本消息模型”的基本绑定-基本交换机+基本路由 - 面向生产者
+    @Bean
+    public Binding orderProducerBinding() {
+        return BindingBuilder.bind(orderDeadQueue()).to(orderProducerExchange()).with(env.getProperty("mq.producer.order.routing.key.name"));
+    }
+
+
+    //创建真正队列 - 面向消费者
+    @Bean
+    public Queue realOrderConsumerQueue() {
+        return new Queue(env.getProperty("mq.consumer.order.real.queue.name"), true);
+    }
+
+    //创建死信交换机
+    @Bean
+    public TopicExchange basicOrderDeadExchange() {
+        return new TopicExchange(env.getProperty("mq.order.dead.exchange.name"), true, false);
+    }
+
+    //创建死信路由及其绑定
+    @Bean
+    public Binding basicOrderDeadBinding() {
+        return BindingBuilder.bind(realOrderConsumerQueue()).to(basicOrderDeadExchange()).with(env.getProperty("mq.order.dead.routing.key.name"));
+    }
 //
 //
 //
