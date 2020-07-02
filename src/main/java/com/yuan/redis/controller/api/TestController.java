@@ -75,6 +75,7 @@ public class TestController {
     @RequestMapping(value = "/testBloomFilter.json", method = RequestMethod.POST)
     @ApiResponses({@ApiResponse(code = 5000001, message = "参数错误")})
     public Result<Test>  testBloomFilter() {
+        User user = new User();
         return Result.jsonStringOk();
     }
 
