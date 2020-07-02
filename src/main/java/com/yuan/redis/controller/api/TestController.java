@@ -77,6 +77,8 @@ public class TestController {
     public Result<Test>  testBloomFilter() {
         User user = new User();
         user.setUsername("xx");
+        user.setCreateTime(new Date());
+        user.setUpdateTime(new Date());
         return Result.jsonStringOk();
     }
 
