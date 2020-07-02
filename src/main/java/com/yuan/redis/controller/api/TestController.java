@@ -78,7 +78,6 @@ public class TestController {
         User user = new User();
         user.setUsername("xx");
         user.setCreateTime(new Date());
-        user.setUpdateTime(new Date());
         return Result.jsonStringOk();
     }
 
