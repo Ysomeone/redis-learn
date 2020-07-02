@@ -41,6 +41,10 @@ public class ActivityGoods implements GenericEntity{
 	@ApiModelProperty(value = "创建时间", required = true)
 	private String createTime;
 	
-
+	/** 版本号 */
+	@ApiModelProperty(value = "版本号", required = true)
+	@Version
+	@Column(name = "version", nullable = true, length = 19)
+	private Long version;
 	
 }
