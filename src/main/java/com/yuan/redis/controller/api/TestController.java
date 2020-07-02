@@ -76,6 +76,7 @@ public class TestController {
     @ApiResponses({@ApiResponse(code = 5000001, message = "参数错误")})
     public Result<Test>  testBloomFilter() {
         User user = new User();
+        user.setUsername("xx");
         user.setCreateTime(new Date());
         return Result.jsonStringOk();
     }
