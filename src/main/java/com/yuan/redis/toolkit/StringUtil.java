@@ -86,9 +86,7 @@ public class StringUtil {
         System.out.println("commit -m \"yuan\"");
         System.out.println("branch");
         System.out.println("i'am fenzhi");
+        System.out.println("branch");
     }
-
-
-
 
 }
