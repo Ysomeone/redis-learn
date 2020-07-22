@@ -82,5 +82,13 @@ public class StringUtil {
         }
     }
 
+    public static void main(String[] args) {
+        System.out.println("commit -m \"yuan\"");
+        System.out.println("branch");
+        System.out.println("i'am fenzhi");
+    }
+
+
+
 
 }
