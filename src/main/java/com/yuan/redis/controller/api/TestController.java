@@ -75,7 +75,8 @@ public class TestController {
     @RequestMapping(value = "/testBloomFilter.json", method = RequestMethod.POST)
     @ApiResponses({@ApiResponse(code = 5000001, message = "参数错误")})
     public Result<Test>  testBloomFilter() {
-        RedissLockUtil. test();
+        User user = new User();
+        user.setUsername("xx");
         return Result.jsonStringOk();
     }
 
