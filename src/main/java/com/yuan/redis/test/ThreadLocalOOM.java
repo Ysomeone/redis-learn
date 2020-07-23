@@ -15,7 +15,7 @@ public class ThreadLocalOOM {
     private List<User> addBigList() {
         ArrayList<User> userList = new ArrayList<>(MOCK_BIG_DATA_LOOP_SIZE);
         for (int i = 0; i < MOCK_BIG_DATA_LOOP_SIZE; i++) {
-            userList.add(new User("xueyuan", "password" + i, "男", i));
+            userList.add(new User("xuey1uan", "password" + i, "男", i));
         }
         return userList;
     }
