@@ -21,7 +21,7 @@ public interface KillService {
     Result<String> robGoodsByAopLock(Long userId, Long killActivityId) throws Exception;
 
     /**
-     * redisson 实现
+     *  实现
      *
      * @param userId
      * @param killActivityId

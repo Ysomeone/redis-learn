@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -29,6 +30,19 @@ public class TestController {
     @Resource
     private AppUserService userService;
 
+    @PostConstruct
+    public void cpuReaper() {
+        int num = 0;
+        long start = System.currentTimeMillis() / 1000;
+        while (true) {
+            num = num + 1;
+
+            if (num == Integer.MAX_VALUE)
+                System.out.println("reset");
+            num = 0;
+        }
+     }
+
 
     @ApiOperation(value = "修改用户密码", notes = "根据用户id修改密码", authorizations = {@Authorization("sessionId")})
     @ApiImplicitParams({
@@ -36,8 +50,8 @@ public class TestController {
             @ApiImplicitParam(paramType = "query", name = "newPassword", value = "新密码", required = true, dataType = "String")
     })
     @RequestMapping(value = "/updatePassword.json", method = RequestMethod.POST)
-    public Result<String>  updatePassword(HttpServletRequest request, String password,
-                                 String newPassword) {
+    public Result<String> updatePassword(HttpServletRequest request, String password,
+                                         String newPassword) {
         return Result.jsonStringOk();
     }
 
@@ -48,9 +62,9 @@ public class TestController {
             @ApiImplicitParam(paramType = "query", name = "username", value = "用户账号", required = true, dataType = "String"),
             @ApiImplicitParam(paramType = "query", name = "password", value = "用户密码", required = true, dataType = "String")
     })
-    public Result<Test>  saveUserInfo(String username,String password) {
+    public Result<Test> saveUserInfo(String username, String password) {
         List<User> userList = userService.findList(Paramap.create().put("username", username));
-        if(!CollectionUtils.isEmpty(userList)){
+        if (!CollectionUtils.isEmpty(userList)) {
             return Result.jsonStringError("该用户已经被注册", ApiConstants.ERROR100800);
         }
         User user = new User();
@@ -66,7 +80,7 @@ public class TestController {
     @RequestMapping(value = "/testRateLimiter.json", method = RequestMethod.POST)
     @ApiResponses({@ApiResponse(code = 5000001, message = "参数错误")})
 //    @RateLimit(perSecond =100, timeOut = 100)
-    public Result<Test>  testRateLimiter(Test  test) {
+    public Result<Test> testRateLimiter(Test test) {
         return Result.jsonStringOk();
     }
 
@@ -74,8 +88,8 @@ public class TestController {
     @ApiOperation(value = "测试布隆过滤器", notes = "测试布隆过滤器")
     @RequestMapping(value = "/testBloomFilter.json", method = RequestMethod.POST)
     @ApiResponses({@ApiResponse(code = 5000001, message = "参数错误")})
-    public Result<Test>  testBloomFilter() {
-        RedissLockUtil. test();
+    public Result<Test> testBloomFilter() {
+        RedissLockUtil.test();
         return Result.jsonStringOk();
     }
 

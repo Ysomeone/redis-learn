@@ -3,13 +3,14 @@ package com.yuan.redis.toolkit;
 import com.alibaba.fastjson.JSON;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 
 /**
  * 字符串工具
  *
  * @author yuan
  */
-public class StringUtil {
+public class StringUtil<main> {
 
     /**
      * author yuan
@@ -83,14 +84,22 @@ public class StringUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("commit -m \"yuan\"");
-        System.out.println("branch");
-        System.out.println("i'am fenzhi");
-        System.out.println("branch");
-        System.out.println("i am branch");
-        System.out.println("i am boy ");
-        System.out.println("test");
-        System.out.println("dongfangbuyuzhoulanbian");
+//        final int num = 1;
+//        Converter<Integer, String> s = (param) -> System.out.println(String.valueOf(param + num));
+//        s.convert(2);
+
+        HashMap<String, String> mapString = new HashMap<String, String>(6);
+        System.out.println(mapString);
+
     }
+
+    public interface Converter<T1, T2> {
+        void convert(int i);
+    }
+
+
+
+
+
 
 }
